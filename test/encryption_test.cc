@@ -48,7 +48,6 @@
 #include "sound_asset.h"
 #include "sound_asset_writer.h"
 #include "test.h"
-#include "text_asset.h"
 #include <asdcp/KM_util.h>
 #include <sndfile.h>
 #include <boost/test/unit_test.hpp>
@@ -169,7 +168,7 @@ BOOST_AUTO_TEST_CASE (encryption_test)
 		"<catalog xmlns=\"urn:oasis:names:tc:entity:xmlns:xml:catalog\">"
 		"  <uri name=\"http://www.w3.org/TR/2002/REC-xmlenc-core-20021210/xenc-schema.xsd\" uri=\"schema/xenc-schema.xsd\"/>"
 		"  <system systemId=\"http://www.w3.org/TR/2002/REC-xmldsig-core-20020212/xmldsig-core-schema.xsd\" uri=\"schema/xmldsig-core-schema.xsd\"/>"
-		"    <uri name=\"http://www.w3.org/2001/xml.xsd\" uri=\"xml.xsd\"/>"
+		"  <uri name=\"http://www.w3.org/2001/xml.xsd\" uri=\"xml.xsd\"/>"
 		"</catalog>";
 
 	std::ofstream catalog("catalog.xml");
