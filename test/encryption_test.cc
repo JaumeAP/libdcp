@@ -52,6 +52,7 @@
 #include <asdcp/KM_util.h>
 #include <sndfile.h>
 #include <boost/test/unit_test.hpp>
+#include <cstdlib>
 #include <memory>
 
 
@@ -161,6 +162,24 @@ BOOST_AUTO_TEST_CASE (encryption_test)
 	 * in system() below will fail.
 	 */
 	boost::filesystem::current_path(dcp::filesystem::unfix_long_path(boost::filesystem::current_path()));
+
+	string const catalog_string =
+		"<?xml version=\"1.0\"?>"
+		"<!DOCTYPE catalog PUBLIC \"-//OASIS//DTD XML Catalogs V1.0//EN\" \"http://www.oasis-open.org/committees/entity/release/1.0/catalog.dtd\">"
+		"<catalog xmlns=\"urn:oasis:names:tc:entity:xmlns:xml:catalog\">"
+		"  <uri name=\"http://www.w3.org/TR/2002/REC-xmlenc-core-20021210/xenc-schema.xsd\" uri=\"schema/xenc-schema.xsd\"/>"
+		"  <system systemId=\"http://www.w3.org/TR/2002/REC-xmldsig-core-20020212/xmldsig-core-schema.xsd\" uri=\"schema/xmldsig-core-schema.xsd\"/>"
+		"    <uri name=\"http://www.w3.org/2001/xml.xsd\" uri=\"xml.xsd\"/>"
+		"</catalog>";
+
+	std::ofstream catalog("catalog.xml");
+	catalog << catalog_string;
+	catalog.close();
+#ifdef LIBDCP_WINDOWS
+	putenv("XML_CATALOG_FILES=catalog.xml");
+#else
+	setenv("XML_CATALOG_FILES", "catalog.xml", 1);
+#endif
 
 	int r = system (
 		"xmllint --path schema --nonet --noout --schema schema/SMPTE-430-1-2006-Amd-1-2009-KDM.xsd build/test/encryption_test.kdm.xml "
