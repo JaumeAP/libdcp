@@ -38,7 +38,6 @@
 
 
 #include "certificate_chain.h"
-#include "compose.hpp"
 #include "dcp_assert.h"
 #include "exceptions.h"
 #include "filesystem.h"
@@ -62,6 +61,7 @@ LIBDCP_ENABLE_WARNINGS
 #include <openssl/pem.h>
 #include <openssl/rsa.h>
 #include <openssl/x509.h>
+#include <fmt/format.h>
 #include <boost/algorithm/string.hpp>
 #include <fstream>
 #include <iostream>
@@ -118,7 +118,7 @@ command (string cmd)
 	int const code = WEXITSTATUS (r);
 #endif
 	if (code) {
-		throw dcp::MiscError(String::compose("error %1 in %2 within %3", code, cmd, filesystem::current_path().string()));
+		throw dcp::MiscError(fmt::format("error {} in {} within {}", code, cmd, filesystem::current_path().string()));
 	}
 }
 
@@ -247,9 +247,9 @@ CertificateChain::CertificateChain (
 
 	{
 		command (
-			String::compose (
-				"%1 req -new -x509 -sha256 -config ca.cnf -days %2 -set_serial 5"
-				" -subj \"%3\" -key ca.key -outform PEM -out ca.self-signed.pem",
+			fmt::format(
+				"{} req -new -x509 -sha256 -config ca.cnf -days {} -set_serial 5"
+				" -subj \"{}\" -key ca.key -outform PEM -out ca.self-signed.pem",
 				quoted_openssl, validity_in_days, ca_subject
 				)
 			);
@@ -281,16 +281,16 @@ CertificateChain::CertificateChain (
 
 	{
 		command (
-			String::compose (
-				"%1 req -new -config intermediate.cnf -days %2 -subj \"%3\" -key intermediate.key -out intermediate.csr",
+			fmt::format(
+				"{} req -new -config intermediate.cnf -days {} -subj \"{}\" -key intermediate.key -out intermediate.csr",
 				quoted_openssl, validity_in_days - 1, inter_subject
 				)
 			);
 	}
 
 	command (
-		String::compose (
-			"%1 x509 -req -sha256 -days %2 -CA ca.self-signed.pem -CAkey ca.key -set_serial 6"
+		fmt::format(
+			"{} x509 -req -sha256 -days {} -CA ca.self-signed.pem -CAkey ca.key -set_serial 6"
 			" -in intermediate.csr -extfile intermediate.cnf -extensions v3_ca -out intermediate.signed.pem",
 			quoted_openssl, validity_in_days - 1
 			)
@@ -322,16 +322,16 @@ CertificateChain::CertificateChain (
 
 	{
 		command (
-			String::compose (
-				"%1 req -new -config leaf.cnf -days %2 -subj \"%3\" -key leaf.key -outform PEM -out leaf.csr",
+			fmt::format(
+				"{} req -new -config leaf.cnf -days {} -subj \"{}\" -key leaf.key -outform PEM -out leaf.csr",
 				quoted_openssl, validity_in_days - 2, leaf_subject
 				)
 			);
 	}
 
 	command (
-		String::compose (
-			"%1 x509 -req -sha256 -days %2 -CA intermediate.signed.pem -CAkey intermediate.key"
+		fmt::format(
+			"{} x509 -req -sha256 -days {} -CA intermediate.signed.pem -CAkey intermediate.key"
 			" -set_serial 7 -in leaf.csr -extfile leaf.cnf -extensions v3_ca -out leaf.signed.pem",
 			quoted_openssl, validity_in_days - 2
 			)
@@ -700,7 +700,7 @@ CertificateChain::add_signature_value (xmlpp::Element* parent, string ns, bool a
 	}
 	int const r = xmlSecDSigCtxSign (signature_context, parent->cobj ());
 	if (r < 0) {
-		throw MiscError (String::compose ("could not sign (%1)", r));
+		throw MiscError(fmt::format("could not sign ({})", r));
 	}
 
 	xmlSecDSigCtxDestroy (signature_context);

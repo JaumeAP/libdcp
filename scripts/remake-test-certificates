@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DCT=$HOME/src/digital_cinema_tools
-PRIVATE=$HOME/src/libdcp-test-private
+PRIVATE=$HOME/src/libdcp-test-private_v1.12.x
 
 mkdir work
 cd work

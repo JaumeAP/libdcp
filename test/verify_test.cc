@@ -33,7 +33,6 @@
 
 
 #include "combine.h"
-#include "compose.hpp"
 #include "cpl.h"
 #include "dcp.h"
 #include "file.h"
@@ -192,9 +191,9 @@ find_asset_map(path dir)
 static path
 setup (int reference_number, string verify_test_suffix)
 {
-	auto const dir = dcp::String::compose("build/test/verify_test%1", verify_test_suffix);
+	auto const dir = fmt::format("build/test/verify_test{}", verify_test_suffix);
 	prepare_directory (dir);
-	for (auto i: directory_iterator(dcp::String::compose("test/ref/DCP/dcp_test%1", reference_number))) {
+	for (auto i: directory_iterator(fmt::format("test/ref/DCP/dcp_test{}", reference_number))) {
 		copy_file (i.path(), dir / i.path().filename());
 	}
 
@@ -241,18 +240,18 @@ static
 string
 to_string(dcp::VerificationNote const& note)
 {
-	string s = note_to_string(note) + dcp::String::compose(
-		"\n  [%1 %2 %3 %4 %5 %6 ",
+	string s = note_to_string(note) + fmt::format(
+		"\n  [{} {} {} {} {} {} ",
 		static_cast<int>(note.type()),
 		static_cast<int>(note.code()),
-		note.file().get_value_or("<none>"),
+		note.file().get_value_or("<none>").string(),
 		note.line().get_value_or(0),
 		note.frame().get_value_or(0),
 		note.reel_index().get_value_or(-1)
 		);
 
-	s += dcp::String::compose(
-		"%1 %2 %3 %4 %5]\n",
+	s += fmt::format(
+		"{} {} {} {} {}]\n",
 		note.asset_id().get_value_or("<none>"),
 		note.other_asset_id().get_value_or("<none>"),
 		note.cpl_id().get_value_or("<none>"),
@@ -617,7 +616,7 @@ static
 path
 dcp_test1_cpl_path(string suffix)
 {
-	return dcp::String::compose("build/test/verify_test%1/%2", suffix, dcp_test1_cpl());
+	return fmt::format("build/test/verify_test{}/{}", suffix, dcp_test1_cpl().string());
 }
 
 
@@ -625,7 +624,7 @@ static
 path
 dcp_test1_pkl_path(string suffix)
 {
-	return dcp::String::compose("build/test/verify_test%1/%2", suffix, dcp_test1_pkl());
+	return fmt::format("build/test/verify_test{}/{}", suffix, dcp_test1_pkl().string());
 }
 
 
@@ -633,7 +632,7 @@ static
 path
 asset_map (string suffix)
 {
-	return dcp::String::compose("build/test/verify_test%1/ASSETMAP.xml", suffix);
+	return fmt::format("build/test/verify_test{}/ASSETMAP.xml", suffix);
 }
 
 
@@ -643,7 +642,7 @@ BOOST_AUTO_TEST_CASE (verify_invalid_picture_frame_rate)
 
 	replace(suffix, &dcp_test1_cpl_path, "<FrameRate>24 1", "<FrameRate>99 1");
 
-	auto const dir = dcp::String::compose("build/test/verify_test%1", suffix);
+	auto const dir = fmt::format("build/test/verify_test{}", suffix);
 	auto const cpl_path = find_cpl(dir);
 	auto cpl = std::make_shared<dcp::CPL>(cpl_path);
 
@@ -702,7 +701,7 @@ BOOST_AUTO_TEST_CASE (verify_empty_asset_path)
 
 	replace("empty_asset_path", &asset_map, "<Path>video.mxf</Path>", "<Path></Path>");
 
-	auto const dir = dcp::String::compose("build/test/verify_test%1", suffix);
+	auto const dir = fmt::format("build/test/verify_test{}", suffix);
 	auto const cpl_path = find_cpl(dir);
 	auto cpl = std::make_shared<dcp::CPL>(cpl_path);
 
@@ -730,7 +729,7 @@ BOOST_AUTO_TEST_CASE (verify_mismatched_standard)
 
 	replace(suffix, &dcp_test1_cpl_path, "http://www.smpte-ra.org/schemas/429-7/2006/CPL", "http://www.digicine.com/PROTO-ASDCP-CPL-20040511#");
 
-	auto const dir = dcp::String::compose("build/test/verify_test%1", suffix);
+	auto const dir = fmt::format("build/test/verify_test{}", suffix);
 	auto const cpl_path = find_cpl(dir);
 	auto cpl = std::make_shared<dcp::CPL>(cpl_path);
 
@@ -773,7 +772,7 @@ BOOST_AUTO_TEST_CASE (verify_invalid_xml_cpl_id)
 	/* There's no MISMATCHED_CPL_HASHES error here because it can't find the correct hash by ID (since the ID is wrong) */
 	replace("invalid_xml_cpl_id", &dcp_test1_cpl_path, "<Id>urn:uuid:6affb8ee-0020-4dff-a53c-17652f6358ab", "<Id>urn:uuid:6affb8ee-0020-4dff-a53c-17652f6358a");
 
-	auto const dir = dcp::String::compose("build/test/verify_test%1", suffix);
+	auto const dir = fmt::format("build/test/verify_test{}", suffix);
 	auto const cpl_path = find_cpl(dir);
 	auto cpl = std::make_shared<dcp::CPL>(cpl_path);
 
@@ -806,7 +805,7 @@ BOOST_AUTO_TEST_CASE (verify_invalid_xml_issue_date)
 
 	replace("invalid_xml_issue_date", &dcp_test1_cpl_path, "<IssueDate>", "<IssueDate>x");
 
-	auto const dir = dcp::String::compose("build/test/verify_test%1", suffix);
+	auto const dir = fmt::format("build/test/verify_test{}", suffix);
 	auto const cpl_path = find_cpl(dir);
 	auto dcp = dcp::DCP(dir);
 	dcp.read();
@@ -841,7 +840,7 @@ BOOST_AUTO_TEST_CASE (verify_invalid_xml_pkl_id)
 
 	replace("invalid_xml_pkl_id", &dcp_test1_pkl_path, "<Id>urn:uuid:" + dcp_test1_pkl_id().substr(0, 3), "<Id>urn:uuid:x" + dcp_test1_pkl_id().substr(1, 2));
 
-	auto const dir = dcp::String::compose("build/test/verify_test%1", suffix);
+	auto const dir = fmt::format("build/test/verify_test{}", suffix);
 	auto const pkl_path = find_pkl(dir);
 	auto const cpl_path = find_cpl(dir);
 	auto dcp = dcp::DCP(dir);
@@ -878,7 +877,7 @@ BOOST_AUTO_TEST_CASE (verify_invalid_xml_asset_map_id)
 
 	replace("invalid_xml_asset_map_id", &asset_map, "<Id>urn:uuid:" + dcp_test1_asset_map_id.substr(0, 3), "<Id>urn:uuid:x" + dcp_test1_asset_map_id.substr(1, 2));
 
-	auto const dir = dcp::String::compose("build/test/verify_test%1", suffix);
+	auto const dir = fmt::format("build/test/verify_test{}", suffix);
 	auto const cpl_path = find_cpl(dir);
 	auto const asset_map_path = find_asset_map(dir);
 	auto dcp = dcp::DCP(dir);
@@ -2076,7 +2075,7 @@ make_large_subtitle_asset (path font_file)
 	dcp::ArrayData big_fake_font(1024 * 1024);
 	big_fake_font.write (font_file);
 	for (int i = 0; i < 116; ++i) {
-		asset->add_font (dcp::String::compose("big%1", i), big_fake_font);
+		asset->add_font(fmt::format("big{}", i), big_fake_font);
 	}
 	return asset;
 }
@@ -4753,10 +4752,10 @@ BOOST_AUTO_TEST_CASE (verify_mismatched_subtitle_resource_id)
 	auto subs_mxf = dir / "subs.mxf";
 	auto r = writer.OpenWrite(subs_mxf.string().c_str(), writer_info, descriptor, 4096);
 	BOOST_REQUIRE (ASDCP_SUCCESS(r));
-	writer.WriteTimedTextResource (dcp::String::compose(
+	writer.WriteTimedTextResource(fmt::format(
 		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 		"<SubtitleReel xmlns=\"http://www.smpte-ra.org/schemas/428-7/2010/DCST\">"
-		"<Id>urn:uuid:%1</Id>"
+		"<Id>urn:uuid:{}</Id>"
 		"<ContentTitleText>Content</ContentTitleText>"
 		"<AnnotationText>Annotation</AnnotationText>"
 		"<IssueDate>2018-10-02T12:25:14</IssueDate>"
@@ -4830,10 +4829,10 @@ BOOST_AUTO_TEST_CASE (verify_incorrect_timed_text_id)
 	auto subs_mxf = dir / "subs.mxf";
 	auto r = writer.OpenWrite(subs_mxf.string().c_str(), writer_info, descriptor, 4096);
 	BOOST_REQUIRE (ASDCP_SUCCESS(r));
-	writer.WriteTimedTextResource (dcp::String::compose(
+	writer.WriteTimedTextResource(fmt::format(
 		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 		"<SubtitleReel xmlns=\"http://www.smpte-ra.org/schemas/428-7/2010/DCST\">"
-		"<Id>urn:uuid:%1</Id>"
+		"<Id>urn:uuid:{}</Id>"
 		"<ContentTitleText>Content</ContentTitleText>"
 		"<AnnotationText>Annotation</AnnotationText>"
 		"<IssueDate>2018-10-02T12:25:14+02:00</IssueDate>"
@@ -5866,7 +5865,7 @@ BOOST_AUTO_TEST_CASE(verify_dcp_with_two_cpls)
 	vector<shared_ptr<dcp::CPL>> cpls;
 	vector<string> picture_ids;
 	for (auto i = 0; i < 2; ++i) {
-		auto dcp_dir = dcp::String::compose("%1_%2", prefix, i);
+		auto dcp_dir = fmt::format("{}_{}", prefix, i);
 		prepare_directory(dcp_dir);
 		auto picture = simple_picture(dcp_dir, "foo");
 		picture_ids.push_back(picture->id());

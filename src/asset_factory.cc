@@ -39,13 +39,13 @@
 
 #include "asset_factory.h"
 #include "atmos_asset.h"
-#include "compose.hpp"
 #include "mono_j2k_picture_asset.h"
 #include "mono_mpeg2_picture_asset.h"
 #include "smpte_text_asset.h"
 #include "sound_asset.h"
 #include "stereo_j2k_picture_asset.h"
 #include "stereo_j2k_picture_asset.h"
+#include <fmt/format.h>
 #include <memory>
 
 
@@ -65,7 +65,7 @@ dcp::asset_factory (boost::filesystem::path path, bool ignore_incorrect_picture_
 	Kumu::FileReaderFactory factory;
  	auto const result = ASDCP::EssenceType(dcp::filesystem::fix_long_path(path).string().c_str(), type, factory);
 	if (!ASDCP_SUCCESS(result)) {
-		throw ReadError(String::compose("Could not find essence type (%1)", result.Message()), path.string());
+		throw ReadError(fmt::format("Could not find essence type ({})", result.Message()), path.string());
 	}
 	switch (type) {
 	case ASDCP::ESS_UNKNOWN:
@@ -97,7 +97,7 @@ dcp::asset_factory (boost::filesystem::path path, bool ignore_incorrect_picture_
 	case ASDCP::ESS_DCDATA_DOLBY_ATMOS:
 		return make_shared<AtmosAsset>(path);
 	default:
-		throw ReadError (String::compose("Unknown MXF essence type %1 in %2", static_cast<int>(type), path.string()));
+		throw ReadError(fmt::format("Unknown MXF essence type {} in {}", static_cast<int>(type), path.string()));
 	}
 
 	return {};

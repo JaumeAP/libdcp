@@ -37,7 +37,6 @@
  */
 
 
-#include "compose.hpp"
 #include "dcp_assert.h"
 #include "equality_options.h"
 #include "exceptions.h"
@@ -54,6 +53,7 @@ LIBDCP_DISABLE_WARNINGS
 #include <asdcp/Metadata.h>
 LIBDCP_ENABLE_WARNINGS
 #include <libxml++/nodes/element.h>
+#include <fmt/format.h>
 #include <boost/filesystem.hpp>
 
 
@@ -165,8 +165,8 @@ SoundAsset::equals(shared_ptr<const Asset> other, EqualityOptions const& opt, No
 	if (desc_A.EditRate != desc_B.EditRate) {
 		note (
 			NoteType::ERROR,
-			String::compose (
-				"audio edit rates differ: %1/%2 cf %3/%4",
+			fmt::format(
+				"audio edit rates differ: {}/{} cf {}/{}",
 				desc_A.EditRate.Numerator, desc_A.EditRate.Denominator, desc_B.EditRate.Numerator, desc_B.EditRate.Denominator
 				)
 			);
@@ -174,33 +174,33 @@ SoundAsset::equals(shared_ptr<const Asset> other, EqualityOptions const& opt, No
 	} else if (desc_A.AudioSamplingRate != desc_B.AudioSamplingRate) {
 		note (
 			NoteType::ERROR,
-			String::compose (
-				"audio sampling rates differ: %1 cf %2",
+			fmt::format(
+				"audio sampling rates differ: {} cf {}",
 				desc_A.AudioSamplingRate.Numerator, desc_A.AudioSamplingRate.Denominator,
 				desc_B.AudioSamplingRate.Numerator, desc_B.AudioSamplingRate.Numerator
 				)
 			);
 		return false;
 	} else if (desc_A.Locked != desc_B.Locked) {
-		note (NoteType::ERROR, String::compose ("audio locked flags differ: %1 cf %2", desc_A.Locked, desc_B.Locked));
+		note (NoteType::ERROR, fmt::format("audio locked flags differ: {} cf {}", desc_A.Locked, desc_B.Locked));
 		return false;
 	} else if (desc_A.ChannelCount != desc_B.ChannelCount) {
-		note (NoteType::ERROR, String::compose ("audio channel counts differ: %1 cf %2", desc_A.ChannelCount, desc_B.ChannelCount));
+		note (NoteType::ERROR, fmt::format("audio channel counts differ: {} cf {}", desc_A.ChannelCount, desc_B.ChannelCount));
 		return false;
 	} else if (desc_A.QuantizationBits != desc_B.QuantizationBits) {
-		note (NoteType::ERROR, String::compose ("audio bits per sample differ: %1 cf %2", desc_A.QuantizationBits, desc_B.QuantizationBits));
+		note (NoteType::ERROR, fmt::format("audio bits per sample differ: {} cf {}", desc_A.QuantizationBits, desc_B.QuantizationBits));
 		return false;
 	} else if (desc_A.BlockAlign != desc_B.BlockAlign) {
-		note (NoteType::ERROR, String::compose ("audio bytes per sample differ: %1 cf %2", desc_A.BlockAlign, desc_B.BlockAlign));
+		note (NoteType::ERROR, fmt::format("audio bytes per sample differ: {} cf {}", desc_A.BlockAlign, desc_B.BlockAlign));
 		return false;
 	} else if (desc_A.AvgBps != desc_B.AvgBps) {
-		note (NoteType::ERROR, String::compose ("audio average bps differ: %1 cf %2", desc_A.AvgBps, desc_B.AvgBps));
+		note (NoteType::ERROR, fmt::format("audio average bps differ: {} cf {}", desc_A.AvgBps, desc_B.AvgBps));
 		return false;
 	} else if (desc_A.LinkedTrackID != desc_B.LinkedTrackID) {
-		note (NoteType::ERROR, String::compose ("audio linked track IDs differ: %1 cf %2", desc_A.LinkedTrackID, desc_B.LinkedTrackID));
+		note (NoteType::ERROR, fmt::format("audio linked track IDs differ: {} cf {}", desc_A.LinkedTrackID, desc_B.LinkedTrackID));
 		return false;
 	} else if (desc_A.ContainerDuration != desc_B.ContainerDuration) {
-		note (NoteType::ERROR, String::compose ("audio container durations differ: %1 cf %2", desc_A.ContainerDuration, desc_B.ContainerDuration));
+		note (NoteType::ERROR, fmt::format("audio container durations differ: {} cf {}", desc_A.ContainerDuration, desc_B.ContainerDuration));
 		return false;
 	} else if (desc_A.ChannelFormat != desc_B.ChannelFormat) {
 		/* XXX */
@@ -217,7 +217,7 @@ SoundAsset::equals(shared_ptr<const Asset> other, EqualityOptions const& opt, No
 		auto frame_B = other_reader->get_frame (i);
 
 		if (frame_A->size() != frame_B->size()) {
-			note (NoteType::ERROR, String::compose ("sizes of audio data for frame %1 differ", i));
+			note(NoteType::ERROR, fmt::format("sizes of audio data for frame {} differ", i));
 			return false;
 		}
 
@@ -226,7 +226,7 @@ SoundAsset::equals(shared_ptr<const Asset> other, EqualityOptions const& opt, No
 				for (int channel = 0; channel < frame_A->channels(); ++channel) {
 					int32_t const d = abs(frame_A->get(channel, sample) - frame_B->get(channel, sample));
 					if (d > opt.max_audio_sample_error) {
-						note (NoteType::ERROR, String::compose("PCM data difference of %1 in frame %2, channel %3, sample %4", d, i, channel, sample));
+						note(NoteType::ERROR, fmt::format("PCM data difference of {} in frame {}, channel {}, sample {}", d, i, channel, sample));
 						return false;
 					}
 				}

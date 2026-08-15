@@ -38,12 +38,12 @@
 
 
 #include "colour_conversion.h"
-#include "compose.hpp"
 #include "dcp_assert.h"
 #include "openjpeg_image.h"
 #include "piecewise_lut.h"
 #include "rgb_xyz.h"
 #include "transfer_function.h"
+#include <fmt/format.h>
 #include <cmath>
 
 
@@ -181,21 +181,21 @@ dcp::xyz_to_rgb (
 
 			if (cx < 0 || cx > 4095) {
 				if (note) {
-					note.get()(NoteType::NOTE, String::compose("XYZ value %1 out of range", cx));
+					note.get()(NoteType::NOTE, fmt::format("XYZ value {} out of range", cx));
 				}
 				cx = max (min (cx, 4095), 0);
 			}
 
 			if (cy < 0 || cy > 4095) {
 				if (note) {
-					note.get()(NoteType::NOTE, String::compose("XYZ value %1 out of range", cy));
+					note.get()(NoteType::NOTE, fmt::format("XYZ value {} out of range", cy));
 				}
 				cy = max (min (cy, 4095), 0);
 			}
 
 			if (cz < 0 || cz > 4095) {
 				if (note) {
-					note.get()(NoteType::NOTE, String::compose("XYZ value %1 out of range", cz));
+					note.get()(NoteType::NOTE, fmt::format("XYZ value {} out of range", cz));
 				}
 				cz = max (min (cz, 4095), 0);
 			}

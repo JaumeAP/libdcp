@@ -32,7 +32,6 @@
 */
 
 
-#include "compose.hpp"
 #include "cpl.h"
 #include "reel.h"
 #include "reel_sound_asset.h"
@@ -45,6 +44,7 @@ LIBDCP_DISABLE_WARNINGS
 #include <asdcp/Metadata.h>
 #include <libxml++/libxml++.h>
 LIBDCP_ENABLE_WARNINGS
+#include <fmt/format.h>
 #include <boost/test/unit_test.hpp>
 
 
@@ -61,10 +61,10 @@ using std::vector;
 BOOST_AUTO_TEST_CASE (parse_mca_descriptors_from_mxf_test)
 {
 	for (int i = 1; i < 3; ++i) {
-		auto sound_asset = make_shared<dcp::SoundAsset>(private_test / "data" / dcp::String::compose("51_sound_with_mca_%1.mxf", i));
+		auto sound_asset = make_shared<dcp::SoundAsset>(private_test / "data" / fmt::format("51_sound_with_mca_{}.mxf", i));
 		auto reel_sound_asset = make_shared<dcp::ReelSoundAsset>(sound_asset, 0);
 		auto reel = make_shared<dcp::Reel>();
-		reel->add (black_picture_asset(dcp::String::compose("build/test/parse_mca_descriptors_from_mxf_test%1", i), 24));
+		reel->add(black_picture_asset(fmt::format("build/test/parse_mca_descriptors_from_mxf_test{}", i), 24));
 		reel->add (reel_sound_asset);
 
 		dcp::CPL cpl("", dcp::ContentKind::FEATURE, dcp::Standard::SMPTE);
@@ -73,10 +73,10 @@ BOOST_AUTO_TEST_CASE (parse_mca_descriptors_from_mxf_test)
 		cpl.set_main_sound_sample_rate(48000);
 		cpl.set_main_picture_stored_area(dcp::Size(1998, 1080));
 		cpl.set_main_picture_active_area(dcp::Size(1998, 1080));
-		cpl.write_xml (dcp::String::compose("build/test/parse_mca_descriptors_from_mxf_test%1/cpl.xml", i), shared_ptr<dcp::CertificateChain>());
+		cpl.write_xml(fmt::format("build/test/parse_mca_descriptors_from_mxf_test{}/cpl.xml", i), shared_ptr<dcp::CertificateChain>());
 
-		cxml::Document ref("CompositionPlaylist", private_test / dcp::String::compose("51_sound_with_mca_%1.cpl", i));
-		cxml::Document check("CompositionPlaylist", dcp::String::compose("build/test/parse_mca_descriptors_from_mxf_test%1/cpl.xml", i));
+		cxml::Document ref("CompositionPlaylist", private_test / fmt::format("51_sound_with_mca_{}.cpl", i));
+		cxml::Document check("CompositionPlaylist", fmt::format("build/test/parse_mca_descriptors_from_mxf_test{}/cpl.xml", i));
 
 		vector<string> ignore;
 		check_xml (
@@ -148,7 +148,7 @@ static
 void
 check_mca_descriptors(int suffix, vector<dcp::Channel> extra_active_channels, vector<string> expected_mca_tag_symbols)
 {
-	auto const dir = boost::filesystem::path(dcp::String::compose("build/test/check_mca_descriptors_%1", suffix));
+	auto const dir = boost::filesystem::path(fmt::format("build/test/check_mca_descriptors_{}", suffix));
 	boost::filesystem::remove_all(dir);
 	boost::filesystem::create_directories(dir);
 

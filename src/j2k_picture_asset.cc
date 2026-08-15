@@ -37,7 +37,6 @@
  */
 
 
-#include "compose.hpp"
 #include "dcp_assert.h"
 #include "equality_options.h"
 #include "j2k_transcode.h"
@@ -47,6 +46,7 @@
 #include <asdcp/AS_DCP.h>
 #include <asdcp/KM_fileio.h>
 #include <libxml++/nodes/element.h>
+#include <fmt/format.h>
 #include <boost/filesystem.hpp>
 #include <list>
 
@@ -155,7 +155,7 @@ J2KPictureAsset::frame_buffer_equals (
 	for (int c = 0; c < 3; ++c) {
 
 		if (image_A->size() != image_B->size()) {
-			note (NoteType::ERROR, String::compose ("image sizes for frame %1 differ", frame));
+			note(NoteType::ERROR, fmt::format("image sizes for frame {} differ", frame));
 			return false;
 		}
 
@@ -181,12 +181,12 @@ J2KPictureAsset::frame_buffer_equals (
 
 	auto const std_dev = sqrt (double (total_squared_deviation) / abs_diffs.size());
 
-	note (NoteType::NOTE, String::compose("mean difference %1 deviation %2", mean, std_dev));
+	note (NoteType::NOTE, fmt::format("mean difference {} deviation {}", mean, std_dev));
 
 	if (mean > opt.max_mean_pixel_error) {
 		note (
 			NoteType::ERROR,
-			String::compose ("mean %1 out of range %2 in frame %3", mean, opt.max_mean_pixel_error, frame)
+			fmt::format("mean {} out of range {} in frame {}", mean, opt.max_mean_pixel_error, frame)
 			);
 
 		return false;
@@ -195,7 +195,7 @@ J2KPictureAsset::frame_buffer_equals (
 	if (std_dev > opt.max_std_dev_pixel_error) {
 		note (
 			NoteType::ERROR,
-			String::compose ("standard deviation %1 out of range %2 in frame %3", std_dev, opt.max_std_dev_pixel_error, frame)
+			fmt::format("standard deviation {} out of range {} in frame {}", std_dev, opt.max_std_dev_pixel_error, frame)
 			);
 
 		return false;

@@ -37,10 +37,10 @@
  */
 
 
-#include "compose.hpp"
 #include "dcp_time.h"
 #include "equality_options.h"
 #include "text.h"
+#include <fmt/format.h>
 
 
 using std::shared_ptr;
@@ -107,7 +107,7 @@ Text::equals(shared_ptr<const Text> other, EqualityOptions const& options, NoteH
 	if (vpos > options.max_text_vertical_position_error)  {
 		note(
 			NoteType::ERROR,
-			String::compose("text vertical positions differ by %1 (more than the allowed difference of %2)", vpos, options.max_text_vertical_position_error)
+			fmt::format("text vertical positions differ by {} (more than the allowed difference of {})", vpos, options.max_text_vertical_position_error)
 		    );
 		same = false;
 	}

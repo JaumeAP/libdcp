@@ -38,7 +38,6 @@
 
 
 #include "certificate_chain.h"
-#include "compose.hpp"
 #include "encrypted_kdm.h"
 #include "exceptions.h"
 #include "file.h"
@@ -48,12 +47,12 @@
 #include <libxml++/document.h>
 #include <libxml++/nodes/element.h>
 #include <libxml/parser.h>
+#include <fmt/format.h>
 #include <boost/algorithm/string.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/format.hpp>
 
 
-using std::list;
 using std::vector;
 using std::string;
 using std::make_shared;
@@ -450,7 +449,7 @@ public:
 			if (disable_forensic_marking_audio) {
 				auto mrkflg = audio_disable;
 				if (*disable_forensic_marking_audio > 0) {
-					mrkflg += String::compose ("-above-channel-%1", *disable_forensic_marking_audio);
+					mrkflg += fmt::format("-above-channel-{}", *disable_forensic_marking_audio);
 				}
 				cxml::add_text_child(forensic_mark_flag_list, "ForensicMarkFlag", mrkflg);
 			}

@@ -37,7 +37,6 @@
  */
 
 
-#include "compose.hpp"
 #include "data.h"
 #include "raw_convert.h"
 #include "verify.h"
@@ -141,21 +140,21 @@ dcp::verify_j2k(shared_ptr<const Data> j2k, int start_index, int frame_index, in
 		auto require_8 = [&](uint8_t value, string note) {
 			auto v = get_8 ();
 			if (v != value) {
-				throw InvalidCodestream (String::compose(note, v));
+				throw InvalidCodestream(fmt::format(note, v));
 			}
 		};
 
 		auto require_16 = [&](uint16_t value, string note) {
 			auto v = get_16 ();
 			if (v != value) {
-				throw InvalidCodestream (String::compose(note, v));
+				throw InvalidCodestream(fmt::format(note, v));
 			}
 		};
 
 		auto require_32 = [&](uint32_t value, string note) {
 			auto v = get_32 ();
 			if (v != value) {
-				throw InvalidCodestream (String::compose(note, v));
+				throw InvalidCodestream(fmt::format(note, v));
 			}
 		};
 
@@ -176,20 +175,20 @@ dcp::verify_j2k(shared_ptr<const Data> j2k, int start_index, int frame_index, in
 		} else if (fourk && rsiz != OPJ_PROFILE_CINEMA_4K) {
 			notes.push_back(VerificationNote(VerificationNote::Code::INVALID_JPEG2000_RSIZ_FOR_4K).set_capabilities(rsiz));
 		}
-		require_32 (0, "invalid top-left image x coordinate %1");
-		require_32 (0, "invalid top-left image y coordinate %1");
+		require_32 (0, "invalid top-left image x coordinate {}");
+		require_32 (0, "invalid top-left image y coordinate {}");
 		auto const tile_width = get_32();
 		auto const tile_height = get_32();
 		if (tile_width != image_width || tile_height != image_height) {
 			notes.push_back ({ VerificationNote::Code::INVALID_JPEG2000_TILE_SIZE });
 		}
-		require_32 (0, "invalid tile anchor x coordinate %1");
-		require_32 (0, "invalid tile anchor y coordinate %1");
-		require_16 (3, "invalid component count %1");
+		require_32 (0, "invalid tile anchor x coordinate {}");
+		require_32 (0, "invalid tile anchor y coordinate {}");
+		require_16 (3, "invalid component count {}");
 		for (auto i = 0; i < 3; ++i) {
-			require_8 (12 - 1, "invalid bit depth %1");
-			require_8 (1, "invalid horizontal subsampling factor %1");
-			require_8 (1, "invalid vertical subsampling factor %1");
+			require_8 (12 - 1, "invalid bit depth {}");
+			require_8 (1, "invalid horizontal subsampling factor {}");
+			require_8 (1, "invalid vertical subsampling factor {}");
 		}
 
 		auto num_COD = 0;
@@ -208,10 +207,10 @@ dcp::verify_j2k(shared_ptr<const Data> j2k, int start_index, int frame_index, in
 			auto marker_name = marker_name_from_id (marker_id);
 			if (!marker_name) {
 				char buffer[16];
-				snprintf (buffer, 16, "%2x", marker_id);
-				throw InvalidCodestream(String::compose("unknown marker %1", buffer));
+				snprintf (buffer, 16, "{}x", marker_id);
+				throw InvalidCodestream(fmt::format("unknown marker {}", buffer));
 			} else if (*marker_name == "SOT") {
-				require_16(10, "invalid SOT size %1");
+				require_16(10, "invalid SOT size {}");
 				get_16(); // tile index
 				auto const tile_part_length = get_32();
 				auto const tile_part_index = get_8();
@@ -240,11 +239,11 @@ dcp::verify_j2k(shared_ptr<const Data> j2k, int start_index, int frame_index, in
 			} else if (*marker_name == "COD") {
 				num_COD++;
 				get_16(); // length
-				require_8(1, "invalid coding style %1");
-				require_8(4, "invalid progression order %1"); // CPRL
-				require_16(1, "invalid quality layers count %1");
-				require_8(1, "invalid multi-component transform flag %1");
-				require_8(fourk ? 6 : 5, "invalid number of transform levels %1");
+				require_8(1, "invalid coding style {}");
+				require_8(4, "invalid progression order {}"); // CPRL
+				require_16(1, "invalid quality layers count {}");
+				require_8(1, "invalid multi-component transform flag {}");
+				require_8(fourk ? 6 : 5, "invalid number of transform levels {}");
 				auto log_code_block_width = get_8();
 				if (log_code_block_width != 3) {
 					notes.push_back(
@@ -258,15 +257,15 @@ dcp::verify_j2k(shared_ptr<const Data> j2k, int start_index, int frame_index, in
 					);
 				}
 				require_8(0, "invalid mode variations");
-				require_8(0, "invalid wavelet transform type %1"); // 9/7 irreversible
-				require_8(0x77, "invalid precinct size %1");
-				require_8(0x88, "invalid precinct size %1");
-				require_8(0x88, "invalid precinct size %1");
-				require_8(0x88, "invalid precinct size %1");
-				require_8(0x88, "invalid precinct size %1");
-				require_8(0x88, "invalid precinct size %1");
+				require_8(0, "invalid wavelet transform type {}"); // 9/7 irreversible
+				require_8(0x77, "invalid precinct size {}");
+				require_8(0x88, "invalid precinct size {}");
+				require_8(0x88, "invalid precinct size {}");
+				require_8(0x88, "invalid precinct size {}");
+				require_8(0x88, "invalid precinct size {}");
+				require_8(0x88, "invalid precinct size {}");
 				if (fourk) {
-					require_8(0x88, "invalid precinct size %1");
+					require_8(0x88, "invalid precinct size {}");
 				}
 			} else if (*marker_name == "QCD") {
 				num_QCD++;
@@ -288,19 +287,19 @@ dcp::verify_j2k(shared_ptr<const Data> j2k, int start_index, int frame_index, in
 				 * like it should be OK.
 				 */
 				if (coc_component_number > 2) {
-					throw InvalidCodestream(String::compose("invalid COC component number %1", coc_component_number));
+					throw InvalidCodestream(fmt::format("invalid COC component number {}", coc_component_number));
 				}
-				require_8(1, "invalid coding style %1");
-				require_8(5, "invalid number of transform levels %1");
-				require_8(3, "invalid code block width exponent %1");
-				require_8(3, "invalid code block height exponent %1");
+				require_8(1, "invalid coding style {}");
+				require_8(5, "invalid number of transform levels {}");
+				require_8(3, "invalid code block width exponent {}");
+				require_8(3, "invalid code block height exponent {}");
 				require_8(0, "invalid mode variations");
-				require_8(0x77, "invalid precinct size %1");
-				require_8(0x88, "invalid precinct size %1");
-				require_8(0x88, "invalid precinct size %1");
-				require_8(0x88, "invalid precinct size %1");
-				require_8(0x88, "invalid precinct size %1");
-				require_8(0x88, "invalid precinct size %1");
+				require_8(0x77, "invalid precinct size {}");
+				require_8(0x88, "invalid precinct size {}");
+				require_8(0x88, "invalid precinct size {}");
+				require_8(0x88, "invalid precinct size {}");
+				require_8(0x88, "invalid precinct size {}");
+				require_8(0x88, "invalid precinct size {}");
 			} else if (*marker_name == "TLM") {
 				auto const len = get_16();
 				ptr += len - 2;
@@ -327,19 +326,19 @@ dcp::verify_j2k(shared_ptr<const Data> j2k, int start_index, int frame_index, in
 					}
 				};
 
-				require_16_poc(16, "invalid length %1");
-				require_8_poc(0, "invalid RSpoc %1");
-				require_8_poc(0, "invalid CSpoc %1");
-				require_16_poc(1, "invalid LYEpoc %1");
-				require_8_poc(6, "invalid REpoc %1");
-				require_8_poc(3, "invalid CEpoc %1");
-				require_8_poc(4, "invalid Ppoc %1");
-				require_8_poc(6, "invalid RSpoc %1");
-				require_8_poc(0, "invalid CSpoc %1");
-				require_16_poc(1, "invalid LYEpoc %1");
-				require_8_poc(7, "invalid REpoc %1");
-				require_8_poc(3, "invalid CEpoc %1");
-				require_8_poc(4, "invalid Ppoc %1");
+				require_16_poc(16, "invalid length {}");
+				require_8_poc(0, "invalid RSpoc {}");
+				require_8_poc(0, "invalid CSpoc {}");
+				require_16_poc(1, "invalid LYEpoc {}");
+				require_8_poc(6, "invalid REpoc {}");
+				require_8_poc(3, "invalid CEpoc {}");
+				require_8_poc(4, "invalid Ppoc {}");
+				require_8_poc(6, "invalid RSpoc {}");
+				require_8_poc(0, "invalid CSpoc {}");
+				require_16_poc(1, "invalid LYEpoc {}");
+				require_8_poc(7, "invalid REpoc {}");
+				require_8_poc(3, "invalid CEpoc {}");
+				require_8_poc(4, "invalid Ppoc {}");
 			}
 		}
 

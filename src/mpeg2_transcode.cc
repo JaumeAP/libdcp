@@ -32,7 +32,6 @@
 */
 
 
-#include "compose.hpp"
 #include "exceptions.h"
 #include "mono_mpeg2_picture_frame.h"
 #include "mpeg2_transcode.h"
@@ -40,6 +39,7 @@
 extern "C" {
 #include <libavcodec/avcodec.h>
 }
+#include <fmt/format.h>
 
 
 using std::make_shared;
@@ -121,7 +121,7 @@ MPEG2Decompressor::decompress_packet(AVPacket* packet)
 {
 	int const r = avcodec_send_packet(_context, packet);
 	if (r < 0) {
-		throw MPEG2DecompressionError(String::compose("avcodec_send_packet failed (%1)", r));
+		throw MPEG2DecompressionError(fmt::format("avcodec_send_packet failed ({})", r));
 	}
 
 	vector<FFmpegImage> images;
@@ -178,7 +178,7 @@ MPEG2Compressor::send_and_receive(AVFrame const* frame)
 {
 	int r = avcodec_send_frame(_context, frame);
 	if (r < 0) {
-		throw MPEG2CompressionError(String::compose("avcodec_send_frame failed (%1", r));
+		throw MPEG2CompressionError(fmt::format("avcodec_send_frame failed ({})", r));
 	}
 
 	auto packet = av_packet_alloc();
@@ -188,7 +188,7 @@ MPEG2Compressor::send_and_receive(AVFrame const* frame)
 
 	r = avcodec_receive_packet(_context, packet);
 	if (r < 0 && r != AVERROR(EAGAIN)) {
-		throw MPEG2CompressionError(String::compose("avcodec_receive_packet failed (%1)", r));
+		throw MPEG2CompressionError(fmt::format("avcodec_receive_packet failed ({})", r));
 	}
 
 	ScopeGuard sg = [&packet]() {

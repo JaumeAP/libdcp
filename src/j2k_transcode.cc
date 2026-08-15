@@ -42,8 +42,8 @@
 #include "exceptions.h"
 #include "openjpeg_image.h"
 #include "dcp_assert.h"
-#include "compose.hpp"
 #include <openjpeg.h>
+#include <fmt/format.h>
 #include <cmath>
 
 
@@ -51,7 +51,6 @@ using std::min;
 using std::pow;
 using std::string;
 using std::shared_ptr;
-using boost::shared_array;
 using namespace dcp;
 
 
@@ -169,9 +168,9 @@ dcp::decompress_j2k (uint8_t const * data, int64_t size, int reduce)
 		opj_destroy_codec (decoder);
 		opj_stream_destroy (stream);
 		if (format == OPJ_CODEC_J2K) {
-			boost::throw_exception (ReadError (String::compose ("could not decode JPEG2000 codestream of %1 bytes.", size)));
+			boost::throw_exception(ReadError(fmt::format("could not decode JPEG2000 codestream of {} bytes.", size)));
 		} else {
-			boost::throw_exception (ReadError (String::compose ("could not decode JP2 file of %1 bytes.", size)));
+			boost::throw_exception(ReadError(fmt::format("could not decode JP2 file of {} bytes.", size)));
 		}
 	}
 
@@ -279,7 +278,7 @@ dcp::compress_j2k (shared_ptr<const OpenJPEGImage> xyz, int bandwidth, int frame
 	opj_setup_encoder (encoder, &parameters, xyz->opj_image());
 
 #ifndef LIBDCP_HAVE_NUMGBITS
-	string numgbits = String::compose("GUARD_BITS=%1", fourk ? 2 : 1);
+	string numgbits = fmt::format("GUARD_BITS={}", fourk ? 2 : 1);
 	char const* extra_options[] = { numgbits.c_str(), nullptr };
 	opj_encoder_set_extra_options(encoder, extra_options);
 #endif

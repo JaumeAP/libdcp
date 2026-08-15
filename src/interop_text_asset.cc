@@ -37,7 +37,6 @@
  */
 
 
-#include "compose.hpp"
 #include "dcp_assert.h"
 #include "equality_options.h"
 #include "filesystem.h"
@@ -97,7 +96,7 @@ InteropTextAsset::InteropTextAsset(boost::filesystem::path file)
 	for (auto i: _texts) {
 		auto si = dynamic_pointer_cast<TextImage>(i);
 		if (si) {
-			si->read_png_file (file.parent_path() / String::compose("%1.png", si->id()));
+			si->read_png_file (file.parent_path() / fmt::format("{}.png", si->id()));
 		}
 	}
 }
@@ -137,7 +136,7 @@ void
 InteropTextAsset::add_font(string load_id, dcp::ArrayData data)
 {
 	_fonts.push_back (Font(load_id, make_uuid(), data));
-	auto const uri = String::compose("font_%1.ttf", _load_font_nodes.size());
+	auto const uri = fmt::format("font_{}.ttf", _load_font_nodes.size());
 	_load_font_nodes.push_back (make_shared<InteropLoadFontNode>(load_id, uri));
 }
 
@@ -209,7 +208,7 @@ InteropTextAsset::write(boost::filesystem::path p) const
 	/* Image subtitles */
 	for (auto i: _texts) {
 		if (auto im = dynamic_pointer_cast<dcp::TextImage>(i)) {
-			im->write_png_file(p.parent_path() / String::compose("%1.png", im->id()));
+			im->write_png_file(p.parent_path() / fmt::format("{}.png", im->id()));
 		}
 	}
 

@@ -37,7 +37,6 @@
  */
 
 
-#include "compose.hpp"
 #include "dcp_assert.h"
 #include "exceptions.h"
 #include "raw_convert.h"
@@ -92,7 +91,7 @@ Fraction::Fraction (string s)
 string
 Fraction::as_string () const
 {
-	return String::compose ("%1 %2", numerator, denominator);
+	return fmt::format("{} {}", numerator, denominator);
 }
 
 
@@ -353,7 +352,7 @@ void
 Luminance::set_value (float v)
 {
 	if (v < 0) {
-		throw dcp::MiscError (String::compose("Invalid luminance value %1", v));
+		throw dcp::MiscError(fmt::format("Invalid luminance value {}", v));
 	}
 
 	_value = v;
@@ -394,7 +393,7 @@ Luminance::string_to_unit (string u)
 		return Unit::FOOT_LAMBERT;
 	}
 
-	throw XMLError (String::compose("Invalid luminance unit %1", u));
+	throw XMLError(fmt::format("Invalid luminance unit {}", u));
 }
 
 

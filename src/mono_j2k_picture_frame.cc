@@ -37,7 +37,6 @@
  */
 
 
-#include "compose.hpp"
 #include "crypto_context.h"
 #include "exceptions.h"
 #include "file.h"
@@ -48,6 +47,7 @@
 #include "util.h"
 #include <asdcp/KM_fileio.h>
 #include <asdcp/AS_DCP.h>
+#include <fmt/format.h>
 
 
 using std::make_shared;
@@ -87,7 +87,7 @@ MonoJ2KPictureFrame::MonoJ2KPictureFrame (ASDCP::JP2K::MXFReader* reader, int n,
 	auto const r = reader->ReadFrame (n, *_buffer, c->context(), check_hmac ? c->hmac() : nullptr);
 
 	if (ASDCP_FAILURE(r)) {
-		boost::throw_exception (ReadError(String::compose ("could not read video frame %1 (%2)", n, static_cast<int>(r))));
+		boost::throw_exception(ReadError(fmt::format("could not read video frame {} ({})", n, static_cast<int>(r))));
 	}
 }
 

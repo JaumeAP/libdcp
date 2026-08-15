@@ -37,7 +37,6 @@
  */
 
 
-#include "compose.hpp"
 #include "dcp_assert.h"
 #include "equality_options.h"
 #include "exceptions.h"
@@ -48,16 +47,15 @@
 #include "mono_j2k_picture_frame.h"
 #include <asdcp/AS_DCP.h>
 #include <asdcp/KM_fileio.h>
+#include <fmt/format.h>
 #include <boost/bind/bind.hpp>
 
 
 using std::dynamic_pointer_cast;
 using std::list;
-using std::make_shared;
 using std::pair;
 using std::shared_ptr;
 using std::string;
-using std::vector;
 #if BOOST_VERSION >= 106100
 using namespace boost::placeholders;
 #endif
@@ -175,7 +173,7 @@ MonoJ2KPictureAsset::equals(shared_ptr<const Asset> other, EqualityOptions const
 #pragma omp critical
 #endif
 			{
-				note (NoteType::PROGRESS, String::compose("Compared video frame %1 of %2", i, _intrinsic_duration));
+				note(NoteType::PROGRESS, fmt::format("Compared video frame {} of {}", i, _intrinsic_duration));
 				for (auto const& i: notes) {
 					note (i.first, i.second);
 				}

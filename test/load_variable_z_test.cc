@@ -35,10 +35,10 @@
 #include "load_variable_z.h"
 #include "smpte_text_asset.h"
 #include "warnings.h"
-#include "compose.hpp"
 LIBDCP_DISABLE_WARNINGS
 #include <libxml++/libxml++.h>
 LIBDCP_ENABLE_WARNINGS
+#include <fmt/format.h>
 #include <boost/test/unit_test.hpp>
 
 
@@ -50,7 +50,7 @@ dcp::LoadVariableZ
 create(string id, string content)
 {
 	cxml::Document doc("LoadVariableZ");
-	doc.read_string(dcp::String::compose("<LoadVariableZ ID=\"%1\">%2</LoadVariableZ>", id, content));
+	doc.read_string(fmt::format("<LoadVariableZ ID=\"{}\">{}</LoadVariableZ>", id, content));
 	return dcp::LoadVariableZ(dynamic_cast<xmlpp::Element const*>(doc.node()));
 
 }
@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE(variable_z_test)
 	for (auto bad: { "", "-4.2 hello", "1:2:3", "-6.4:0", "-6.2:" }) {
 		dcp::LoadVariableZ test = create("foo", bad);
 		BOOST_CHECK_MESSAGE(!test.valid(), bad);
-		BOOST_CHECK_EQUAL(xml(test), dcp::String::compose("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<LoadVariableZ ID=\"foo\">%1</LoadVariableZ>\n", bad));
+		BOOST_CHECK_EQUAL(xml(test), fmt::format("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<LoadVariableZ ID=\"foo\">{}</LoadVariableZ>\n", bad));
 	}
 
 	dcp::LoadVariableZ good = create("bar", "   -1.4  4.6:2 \t 9.1:9\n");

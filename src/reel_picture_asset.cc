@@ -37,7 +37,6 @@
  */
 
 
-#include "compose.hpp"
 #include "dcp_assert.h"
 #include "j2k_picture_asset.h"
 #include "raw_convert.h"
@@ -92,7 +91,7 @@ ReelPictureAsset::write_to_cpl(xmlpp::Element* node, Standard standard) const
 {
 	auto asset = ReelFileAsset::write_to_cpl (node, standard);
 
-	cxml::add_text_child(asset, "FrameRate", String::compose("%1 %2", _frame_rate.numerator, _frame_rate.denominator));
+	cxml::add_text_child(asset, "FrameRate", fmt::format("{} {}", _frame_rate.numerator, _frame_rate.denominator));
 
 	if (standard == Standard::INTEROP) {
 
@@ -119,7 +118,7 @@ ReelPictureAsset::write_to_cpl(xmlpp::Element* node, Standard standard) const
 		cxml::add_text_child(
 			asset,
 			"ScreenAspectRatio",
-			String::compose("%1 %2", _screen_aspect_ratio.numerator, _screen_aspect_ratio.denominator)
+			fmt::format("{} {}", _screen_aspect_ratio.numerator, _screen_aspect_ratio.denominator)
 			);
 	}
 

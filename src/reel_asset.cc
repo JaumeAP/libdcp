@@ -38,7 +38,6 @@
 
 
 #include "asset.h"
-#include "compose.hpp"
 #include "dcp_assert.h"
 #include "equality_options.h"
 #include "raw_convert.h"
@@ -142,7 +141,7 @@ ReelAsset::asset_equals(shared_ptr<const ReelAsset> other, EqualityOptions const
 	auto const node = cpl_node_name();
 
 	if (_annotation_text != other->_annotation_text) {
-		string const s = String::compose("Reel %1: annotation texts differ (%2 vs %3)", node, optional_to_string(_annotation_text), optional_to_string(other->_annotation_text));
+		string const s = fmt::format("Reel {}: annotation texts differ ({} vs {})", node, optional_to_string(_annotation_text), optional_to_string(other->_annotation_text));
 		if (!opt.reel_annotation_texts_can_differ) {
 			note (NoteType::ERROR, s);
 			return false;
@@ -154,7 +153,7 @@ ReelAsset::asset_equals(shared_ptr<const ReelAsset> other, EqualityOptions const
 	if (_edit_rate != other->_edit_rate) {
 		note (
 			NoteType::ERROR,
-			String::compose("Reel %1: edit rates differ (%2 vs %3)", node, _edit_rate.as_string(), other->_edit_rate.as_string())
+			fmt::format("Reel {}: edit rates differ ({} vs {})", node, _edit_rate.as_string(), other->_edit_rate.as_string())
 		     );
 		return false;
 	}
@@ -162,7 +161,7 @@ ReelAsset::asset_equals(shared_ptr<const ReelAsset> other, EqualityOptions const
 	if (_intrinsic_duration != other->_intrinsic_duration) {
 		note (
 			NoteType::ERROR,
-			String::compose("Reel %1: intrinsic durations differ (%2 vs %3)", node, _intrinsic_duration, other->_intrinsic_duration)
+			fmt::format("Reel {}: intrinsic durations differ ({} vs {})", node, _intrinsic_duration, other->_intrinsic_duration)
 		     );
 		return false;
 	}
@@ -170,7 +169,7 @@ ReelAsset::asset_equals(shared_ptr<const ReelAsset> other, EqualityOptions const
 	if (_entry_point != other->_entry_point) {
 		note (
 			NoteType::ERROR,
-			String::compose("Reel %1: entry points differ (%2 vs %3)", node, optional_to_string(_entry_point), optional_to_string(other->_entry_point))
+			fmt::format("Reel {}: entry points differ ({} vs {})", node, optional_to_string(_entry_point), optional_to_string(other->_entry_point))
 		     );
 		return false;
 	}
@@ -178,7 +177,7 @@ ReelAsset::asset_equals(shared_ptr<const ReelAsset> other, EqualityOptions const
 	if (_duration != other->_duration) {
 		note (
 			NoteType::ERROR,
-			String::compose("Reel %1: durations differ (%2 vs %3)", node, optional_to_string(_duration), optional_to_string(other->_duration))
+			fmt::format("Reel {}: durations differ ({} vs {})", node, optional_to_string(_duration), optional_to_string(other->_duration))
 		     );
 		return false;
 	}

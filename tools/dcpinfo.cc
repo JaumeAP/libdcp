@@ -33,7 +33,6 @@
 
 
 #include "common.h"
-#include "compose.hpp"
 #include "cpl.h"
 #include "dcp.h"
 #include "decrypted_kdm.h"
@@ -53,6 +52,7 @@
 #include "text_image.h"
 #include "text_string.h"
 #include <getopt.h>
+#include <fmt/format.h>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 #include <iostream>
@@ -103,16 +103,13 @@ mbits_per_second (int size, Fraction frame_rate)
 	return size * 8 * frame_rate.as_float() / 1e6;
 }
 
-#define OUTPUT_DCP_PATH(...)    maybe_output(only, "dcp-path", String::compose(__VA_ARGS__));
-#define OUTPUT_CPL_NAME_ID(...) maybe_output(only, "cpl-name-id", String::compose(__VA_ARGS__));
-#define OUTPUT_PICTURE(...)     maybe_output(only, "picture", String::compose(__VA_ARGS__));
-#define OUTPUT_PICTURE_NC(x)    maybe_output(only, "picture", (x));
+#define OUTPUT_DCP_PATH(...)    maybe_output(only, "dcp-path", fmt::format(__VA_ARGS__));
+#define OUTPUT_CPL_NAME_ID(...) maybe_output(only, "cpl-name-id", fmt::format(__VA_ARGS__));
+#define OUTPUT_PICTURE(...)     maybe_output(only, "picture", fmt::format(__VA_ARGS__));
 #define SHOULD_PICTURE          should_output(only, "picture")
-#define OUTPUT_SOUND(...)       maybe_output(only, "sound", String::compose(__VA_ARGS__));
-#define OUTPUT_SOUND_NC(x)      maybe_output(only, "sound", (x));
-#define OUTPUT_SUBTITLE(...)    maybe_output(only, "subtitle", String::compose(__VA_ARGS__));
-#define OUTPUT_SUBTITLE_NC(x)   maybe_output(only, "subtitle", (x));
-#define OUTPUT_TOTAL_TIME(...)  maybe_output(only, "total-time", String::compose(__VA_ARGS__));
+#define OUTPUT_SOUND(...)       maybe_output(only, "sound", fmt::format(__VA_ARGS__));
+#define OUTPUT_SUBTITLE(...)    maybe_output(only, "subtitle", fmt::format(__VA_ARGS__));
+#define OUTPUT_TOTAL_TIME(...)  maybe_output(only, "total-time", fmt::format(__VA_ARGS__));
 
 static bool
 should_output(vector<string> const& only, string t)
@@ -137,24 +134,24 @@ main_picture (vector<string> const& only, shared_ptr<Reel> reel, bool analyse, b
 		return dcp::Time();
 	}
 
-	OUTPUT_PICTURE("      Picture ID:  %1", mp->id());
+	OUTPUT_PICTURE("      Picture ID:  {}", mp->id());
 	if (mp->entry_point()) {
-		OUTPUT_PICTURE(" entry %1", *mp->entry_point());
+		OUTPUT_PICTURE(" entry {}", *mp->entry_point());
 	}
 	if (mp->duration()) {
 		OUTPUT_PICTURE(
-			" duration %1 (%2) intrinsic %3",
+			" duration {} ({}) intrinsic {}",
 			*mp->duration(),
 			dcp::Time(*mp->duration(), mp->frame_rate().as_float(), mp->frame_rate().as_float()).as_string(dcp::Standard::SMPTE),
 		     	mp->intrinsic_duration()
 			);
 	} else {
-		OUTPUT_PICTURE(" intrinsic duration %1", mp->intrinsic_duration());
+		OUTPUT_PICTURE(" intrinsic duration {}", mp->intrinsic_duration());
 	}
 
 	if (mp->asset_ref().resolved()) {
 		if (mp->asset()) {
-			OUTPUT_PICTURE("\n      Picture:     %1x%2\n", mp->asset()->size().width, mp->asset()->size().height);
+			OUTPUT_PICTURE("\n      Picture:     {}x{}\n", mp->asset()->size().width, mp->asset()->size().height);
 		}
 
 		shared_ptr<MonoJ2KPictureAsset> ma = dynamic_pointer_cast<MonoJ2KPictureAsset>(mp->asset());
@@ -196,7 +193,7 @@ main_picture (vector<string> const& only, shared_ptr<Reel> reel, bool analyse, b
 			}
 		}
 	} else {
-		OUTPUT_PICTURE_NC(" - not present in this DCP.\n");
+		OUTPUT_PICTURE(" - not present in this DCP.\n");
 	}
 
 	return dcp::Time (
@@ -215,26 +212,26 @@ main_sound (vector<string> const& only, shared_ptr<Reel> reel)
 		return;
 	}
 
-	OUTPUT_SOUND("      Sound ID:    %1", ms->id());
+	OUTPUT_SOUND("      Sound ID:    {}", ms->id());
 	if (ms->entry_point()) {
-		OUTPUT_SOUND(" entry %1", *ms->entry_point());
+		OUTPUT_SOUND(" entry {}", *ms->entry_point());
 	}
 	if (ms->duration()) {
-		OUTPUT_SOUND(" duration %1 intrinsic %2", *ms->duration(), ms->intrinsic_duration());
+		OUTPUT_SOUND(" duration {} intrinsic {}", *ms->duration(), ms->intrinsic_duration());
 	} else {
-		OUTPUT_SOUND(" intrinsic duration %1", ms->intrinsic_duration());
+		OUTPUT_SOUND(" intrinsic duration {}", ms->intrinsic_duration());
 	}
 
 	if (ms->asset_ref().resolved()) {
 		if (ms->asset()) {
 			OUTPUT_SOUND(
-				"\n      Sound:       %1 channels at %2Hz\n",
+				"\n      Sound:       {} channels at {}Hz\n",
 				ms->asset()->channels(),
 				ms->asset()->sampling_rate()
 				);
 		}
 	} else {
-		OUTPUT_SOUND_NC(" - not present in this DCP.\n");
+		OUTPUT_SOUND(" - not present in this DCP.\n");
 	}
 }
 
@@ -247,18 +244,18 @@ main_subtitle (vector<string> const& only, shared_ptr<Reel> reel, bool list_subt
 		return;
 	}
 
-	OUTPUT_SUBTITLE("      Subtitle ID: %1", ms->id());
+	OUTPUT_SUBTITLE("      Subtitle ID: {}", ms->id());
 
 	if (ms->asset_ref().resolved()) {
 		auto subs = ms->asset()->texts();
-		OUTPUT_SUBTITLE("\n      Subtitle:    %1 subtitles", subs.size());
+		OUTPUT_SUBTITLE("\n      Subtitle:    {} subtitles", subs.size());
 		auto iop = dynamic_pointer_cast<InteropTextAsset>(ms->asset());
 		if (iop) {
-			OUTPUT_SUBTITLE(" in %1\n", iop->language());
+			OUTPUT_SUBTITLE(" in {}\n", iop->language());
 		}
 		auto smpte = dynamic_pointer_cast<SMPTETextAsset>(ms->asset());
 		if (smpte && smpte->language ()) {
-			OUTPUT_SUBTITLE(" in %1\n", smpte->language().get());
+			OUTPUT_SUBTITLE(" in {}\n", smpte->language().get());
 		}
 		if (list_subtitles) {
 			for (auto k: subs) {
@@ -266,18 +263,18 @@ main_subtitle (vector<string> const& only, shared_ptr<Reel> reel, bool list_subt
 				if (ks) {
 					stringstream s;
 					s << *ks;
-					OUTPUT_SUBTITLE("%1\n", s.str());
+					OUTPUT_SUBTITLE("{}\n", s.str());
 				}
 				auto is = dynamic_pointer_cast<const TextImage>(k);
 				if (is) {
 					stringstream s;
 					s << *is;
-					OUTPUT_SUBTITLE("%1\n", s.str());
+					OUTPUT_SUBTITLE("{}\n", s.str());
 				}
 			}
 		}
 	} else {
-		OUTPUT_SUBTITLE_NC(" - not present in this DCP.\n");
+		OUTPUT_SUBTITLE(" - not present in this DCP.\n");
 	}
 }
 
@@ -383,7 +380,7 @@ main (int argc, char* argv[])
 			exit (EXIT_FAILURE);
 		}
 
-		OUTPUT_DCP_PATH("DCP: %1\n", boost::filesystem::path(argv[optind]).string());
+		OUTPUT_DCP_PATH("DCP: {}\n", boost::filesystem::path(argv[optind]).string());
 
 		for (auto i: dcp::filter_notes(notes, ignore_missing_assets, false)) {
 			cerr << "Error: " << note_to_string(i) << "\n";
@@ -398,7 +395,11 @@ main (int argc, char* argv[])
 	dcp::Time total_time;
 
 	for (auto i: cpls) {
-		OUTPUT_CPL_NAME_ID("  CPL: %1 %2\n", i->annotation_text().get_value_or(""), i->id());
+		if (i->annotation_text()) {
+			OUTPUT_CPL_NAME_ID("  CPL: {} {}\n", *i->annotation_text(), i->id());
+		} else {
+			OUTPUT_CPL_NAME_ID("  CPL: {}\n", i->id());
+		}
 
 		int R = 1;
 		for (auto j: i->reels()) {
@@ -434,7 +435,7 @@ main (int argc, char* argv[])
 		}
 	}
 
-	OUTPUT_TOTAL_TIME("Total: %1\n", total_time.as_string(dcp::Standard::SMPTE));
+	OUTPUT_TOTAL_TIME("Total: {}\n", total_time.as_string(dcp::Standard::SMPTE));
 
 	return 0;
 }
