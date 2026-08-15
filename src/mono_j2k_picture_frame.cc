@@ -37,7 +37,6 @@
  */
 
 
-#include "colour_conversion.h"
 #include "compose.hpp"
 #include "crypto_context.h"
 #include "exceptions.h"
@@ -54,7 +53,6 @@
 using std::make_shared;
 using std::string;
 using std::shared_ptr;
-using boost::optional;
 using namespace dcp;
 
 

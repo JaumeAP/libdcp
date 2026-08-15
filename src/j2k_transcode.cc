@@ -45,7 +45,6 @@
 #include "compose.hpp"
 #include <openjpeg.h>
 #include <cmath>
-#include <iostream>
 
 
 using std::min;

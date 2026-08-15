@@ -40,18 +40,15 @@
 #include "compose.hpp"
 #include "dcp_assert.h"
 #include "equality_options.h"
-#include "exceptions.h"
 #include "j2k_transcode.h"
 #include "openjpeg_image.h"
 #include "j2k_picture_asset.h"
 #include "j2k_picture_asset_writer.h"
-#include "util.h"
 #include <asdcp/AS_DCP.h>
 #include <asdcp/KM_fileio.h>
 #include <libxml++/nodes/element.h>
 #include <boost/filesystem.hpp>
 #include <list>
-#include <stdexcept>
 
 
 using std::string;

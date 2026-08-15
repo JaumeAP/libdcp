@@ -44,7 +44,6 @@
 #include "file.h"
 #include "filesystem.h"
 #include "language_tag.h"
-#include "openjpeg_image.h"
 #include "rating.h"
 #include "types.h"
 #include "util.h"
@@ -66,22 +65,14 @@
 #include <boost/dll/runtime_symbol_info.hpp>
 #endif
 #include <boost/filesystem.hpp>
-#include <stdexcept>
 #include <iostream>
 #include <iomanip>
 
 
 using std::string;
 using std::wstring;
-using std::cout;
-using std::min;
-using std::max;
-using std::setw;
-using std::setfill;
 using std::ostream;
-using std::shared_ptr;
 using std::vector;
-using boost::shared_array;
 using boost::optional;
 using boost::function;
 using boost::algorithm::trim;

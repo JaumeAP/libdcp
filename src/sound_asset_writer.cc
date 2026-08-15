@@ -38,7 +38,6 @@
 
 
 #include "bitstream.h"
-#include "compose.hpp"
 #include "crypto_context.h"
 #include "dcp_assert.h"
 #include "exceptions.h"

@@ -39,7 +39,6 @@
 
 #include "compose.hpp"
 #include "text_string.h"
-#include "xml.h"
 #include <cmath>
 
 

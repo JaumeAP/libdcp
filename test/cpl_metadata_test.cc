@@ -33,7 +33,6 @@
 
 
 #include "certificate_chain.h"
-#include "compose.hpp"
 #include "cpl.h"
 #include "exceptions.h"
 #include "language_tag.h"

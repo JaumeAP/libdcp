@@ -43,7 +43,6 @@
 #include "metadata.h"
 #include "exceptions.h"
 #include "dcp_assert.h"
-#include "compose.hpp"
 #include <asdcp/AS_DCP.h>
 #include <asdcp/KM_prng.h>
 #include <asdcp/KM_util.h>

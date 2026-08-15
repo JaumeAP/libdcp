@@ -23,7 +23,6 @@
 #define DCP_VERIFY_REPORT_H
 
 
-#include "compose.hpp"
 #include "file.h"
 #include "verify.h"
 #include <boost/filesystem.hpp>

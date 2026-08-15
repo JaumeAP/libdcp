@@ -55,7 +55,6 @@ LIBDCP_DISABLE_WARNINGS
 LIBDCP_ENABLE_WARNINGS
 #include <libxml++/nodes/element.h>
 #include <boost/filesystem.hpp>
-#include <stdexcept>
 
 
 using std::dynamic_pointer_cast;

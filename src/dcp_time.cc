@@ -39,7 +39,6 @@
 
 #include "raw_convert.h"
 #include "dcp_time.h"
-#include "exceptions.h"
 #include "compose.hpp"
 #include "dcp_assert.h"
 #include <boost/algorithm/string.hpp>

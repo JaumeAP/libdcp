@@ -65,7 +65,6 @@ using std::cerr;
 using std::cout;
 using std::dynamic_pointer_cast;
 using std::exception;
-using std::list;
 using std::max;
 using std::min;
 using std::pair;

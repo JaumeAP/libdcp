@@ -39,7 +39,6 @@
 
 #include "text_asset_internal.h"
 #include "text_string.h"
-#include "compose.hpp"
 #include <fmt/format.h>
 #include <cmath>
 

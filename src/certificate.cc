@@ -49,7 +49,6 @@
 #include <openssl/asn1.h>
 #include <openssl/err.h>
 #include <boost/algorithm/string.hpp>
-#include <cerrno>
 #include <iostream>
 #include <algorithm>
 

@@ -47,7 +47,6 @@
 #include "text_asset.h"
 #include "text_asset_internal.h"
 #include "util.h"
-#include "xml.h"
 #include <asdcp/AS_DCP.h>
 #include <asdcp/KM_util.h>
 #include <libxml++/nodes/element.h>

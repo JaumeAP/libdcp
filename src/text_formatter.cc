@@ -20,6 +20,7 @@
 
 
 #include "text_formatter.h"
+#include "util.h"
 
 
 using std::unique_ptr;

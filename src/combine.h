@@ -37,9 +37,11 @@
  */
 
 
+#include "local_time.h"
 #include "compose.hpp"
 #include "version.h"
 #include <boost/filesystem.hpp>
+#include <memory>
 
 
 namespace dcp {

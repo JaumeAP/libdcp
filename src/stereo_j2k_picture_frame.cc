@@ -37,10 +37,8 @@
  */
 
 
-#include "colour_conversion.h"
 #include "compose.hpp"
 #include "crypto_context.h"
-#include "exceptions.h"
 #include "j2k_transcode.h"
 #include "rgb_xyz.h"
 #include "stereo_j2k_picture_frame.h"
