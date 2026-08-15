@@ -32,8 +32,8 @@
 */
 
 
-#include "compose.hpp"
 #include "mono_mpeg2_picture_frame.h"
+#include <fmt/format.h>
 
 
 using std::make_shared;
@@ -64,7 +64,7 @@ MonoMPEG2PictureFrame::MonoMPEG2PictureFrame(ASDCP::MPEG2::MXFReader* reader, in
 	auto const r = reader->ReadFrame(n, *_buffer, context->context(), check_hmac ? context->hmac() : nullptr);
 
 	if (ASDCP_FAILURE(r)) {
-		boost::throw_exception(ReadError(String::compose("could not read video frame %1 (%2)", n, static_cast<int>(r))));
+		boost::throw_exception(ReadError(fmt::format("could not read video frame {} ({})", n, static_cast<int>(r))));
 	}
 }
 

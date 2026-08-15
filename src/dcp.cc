@@ -40,7 +40,6 @@
 #include "asset_factory.h"
 #include "atmos_asset.h"
 #include "certificate_chain.h"
-#include "compose.hpp"
 #include "cpl.h"
 #include "dcp.h"
 #include "dcp_assert.h"
@@ -69,6 +68,7 @@ LIBDCP_ENABLE_WARNINGS
 LIBDCP_DISABLE_WARNINGS
 #include <libxml++/libxml++.h>
 LIBDCP_ENABLE_WARNINGS
+#include <fmt/format.h>
 #include <boost/algorithm/string.hpp>
 #include <numeric>
 
@@ -229,7 +229,7 @@ DCP::read (vector<dcp::VerificationNote>* notes, bool ignore_incorrect_picture_m
 			try {
 				p->parse_file(dcp::filesystem::fix_long_path(path).string());
 			} catch (std::exception& e) {
-				throw ReadError(String::compose("XML error in %1", path.string()), e.what());
+				throw ReadError(fmt::format("XML error in {}", path.string()), e.what());
 			}
 
 			auto const root = p->get_document()->get_root_node()->get_name();
@@ -268,7 +268,7 @@ DCP::read (vector<dcp::VerificationNote>* notes, bool ignore_incorrect_picture_m
 		} else if (*pkl_type == "image/png") {
 			/* It's an Interop PNG subtitle; let it go */
 		} else {
-			throw ReadError (String::compose("Unknown asset type %1 in PKL", *pkl_type));
+			throw ReadError(fmt::format("Unknown asset type {} in PKL", *pkl_type));
 		}
 	}
 
@@ -345,7 +345,7 @@ DCP::equals(DCP const & other, EqualityOptions const& opt, NoteHandler note) con
 	auto b = other.cpls ();
 
 	if (a.size() != b.size()) {
-		note (NoteType::ERROR, String::compose ("CPL counts differ: %1 vs %2", a.size(), b.size()));
+		note(NoteType::ERROR, fmt::format("CPL counts differ: {} vs {}", a.size(), b.size()));
 		return false;
 	}
 
@@ -481,10 +481,10 @@ DCP::write_xml(
 		_pkls.push_back(
 			make_shared<PKL>(
 				standard,
-				_new_annotation_text.get_value_or(String::compose("Created by libdcp %1", dcp::version)),
+				_new_annotation_text.get_value_or(fmt::format("Created by libdcp {}", dcp::version)),
 				_new_issue_date.get_value_or(LocalTime().as_string()),
-				_new_issuer.get_value_or(String::compose("libdcp %1", dcp::version)),
-				_new_creator.get_value_or(String::compose("libdcp %1", dcp::version)),
+				_new_issuer.get_value_or(fmt::format("libdcp {}", dcp::version)),
+				_new_creator.get_value_or(fmt::format("libdcp {}", dcp::version)),
 				group_id
 				)
 			);
@@ -506,10 +506,10 @@ DCP::write_xml(
 	if (!_asset_map) {
 		_asset_map = AssetMap(
 			standard,
-			_new_annotation_text.get_value_or(String::compose("Created by libdcp %1", dcp::version)),
+			_new_annotation_text.get_value_or(fmt::format("Created by libdcp {}", dcp::version)),
 			_new_issue_date.get_value_or(LocalTime().as_string()),
-			_new_issuer.get_value_or(String::compose("libdcp %1", dcp::version)),
-			_new_creator.get_value_or(String::compose("libdcp %1", dcp::version))
+			_new_issuer.get_value_or(fmt::format("libdcp {}", dcp::version)),
+			_new_creator.get_value_or(fmt::format("libdcp {}", dcp::version))
 			);
 	}
 
@@ -660,7 +660,7 @@ DCP::cpl_summaries() const
 			try {
 				parser->parse_file(dcp::filesystem::fix_long_path(id_and_path.second).string());
 			} catch (std::exception& e) {
-				throw ReadError(String::compose("XML error in %1", id_and_path.second.string()), e.what());
+				throw ReadError(fmt::format("XML error in {}", id_and_path.second.string()), e.what());
 			}
 
 			if (parser->get_document()->get_root_node()->get_name() == "CompositionPlaylist") {

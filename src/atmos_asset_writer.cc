@@ -39,12 +39,12 @@
 
 #include "atmos_asset.h"
 #include "atmos_asset_writer.h"
-#include "compose.hpp"
 #include "crypto_context.h"
 #include "dcp_assert.h"
 #include "exceptions.h"
 #include "filesystem.h"
 #include <asdcp/AS_DCP.h>
+#include <fmt/format.h>
 
 
 using std::min;
@@ -110,7 +110,7 @@ AtmosAssetWriter::write (uint8_t const * data, int size)
 
 	auto const r = _state->mxf_writer.WriteFrame (_state->frame_buffer, _crypto_context->context(), _crypto_context->hmac());
 	if (ASDCP_FAILURE(r)) {
-		boost::throw_exception (MiscError(String::compose("could not write atmos MXF frame (%1)", static_cast<int>(r))));
+		boost::throw_exception(MiscError(fmt::format("could not write atmos MXF frame ({})", static_cast<int>(r))));
 	}
 
 	++_frames_written;

@@ -38,7 +38,6 @@
 
 
 #include "certificate_chain.h"
-#include "compose.hpp"
 #include "cpl.h"
 #include "dcp_assert.h"
 #include "equality_options.h"
@@ -677,7 +676,7 @@ CPL::equals(shared_ptr<const Asset> other, EqualityOptions const& opt, NoteHandl
 	}
 
 	if (_reels.size() != other_cpl->_reels.size()) {
-		note(NoteType::ERROR, String::compose("CPL: reel counts differ (%1 vs %2)", _reels.size(), other_cpl->_reels.size()));
+		note(NoteType::ERROR, fmt::format("CPL: reel counts differ ({} vs {})", _reels.size(), other_cpl->_reels.size()));
 		return false;
 	}
 

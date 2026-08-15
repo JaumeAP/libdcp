@@ -155,7 +155,6 @@ def build(bld):
               chromaticity.h
               colour_conversion.h
               combine.h
-              compose.hpp
               content_kind.h
               cpl.h
               cpl_summary.h

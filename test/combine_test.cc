@@ -162,8 +162,8 @@ BOOST_AUTO_TEST_CASE (combine_single_dcp_test)
 	dcp::combine (
 		inputs,
 		out,
-		dcp::String::compose("libdcp %1", dcp::version),
-		dcp::String::compose("libdcp %1", dcp::version),
+		fmt::format("libdcp {}", dcp::version),
+		fmt::format("libdcp {}", dcp::version),
 		dcp::LocalTime().as_string(),
 		"A Test DCP"
 		);
@@ -521,8 +521,8 @@ BOOST_AUTO_TEST_CASE(combine_ov_with_vf)
 	dcp::combine(
 		{ ov_path, vf_path },
 		out_path,
-		dcp::String::compose("libdcp %1", dcp::version),
-		dcp::String::compose("libdcp %1", dcp::version),
+		fmt::format("libdcp {}", dcp::version),
+		fmt::format("libdcp {}", dcp::version),
 		dcp::LocalTime().as_string(),
 		"A Test DCP"
 		);

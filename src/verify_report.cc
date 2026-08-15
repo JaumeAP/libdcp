@@ -32,7 +32,6 @@
 */
 
 
-#include "compose.hpp"
 #include "cpl.h"
 #include "dcp.h"
 #include "file.h"
@@ -61,7 +60,7 @@ void write_line(File& file, string format)
 template <typename... Args>
 void write_line(File& file, string format, Args... args)
 {
-	file.puts(String::compose(format + "\n", std::forward<Args>(args)...).c_str());
+	file.puts(fmt::format(format + "\n", std::forward<Args>(args)...).c_str());
 }
 
 
@@ -76,11 +75,11 @@ verify_report(dcp::VerificationResult const& result, Formatter& formatter)
 
 	auto reel_asset_details = [&formatter](shared_ptr<dcp::ReelAsset> asset) {
 		formatter.list_item(fmt::format("UUID: {}", formatter.fixed_width()(asset->id())));
-		formatter.list_item(String::compose("Intrinsic duration: %1", asset->intrinsic_duration()));
-		formatter.list_item(String::compose("Entry point: %1", asset->entry_point().get_value_or(0)));
-		formatter.list_item(String::compose("Duration: %1", asset->duration().get_value_or(0)));
+		formatter.list_item(fmt::format("Intrinsic duration: {}", asset->intrinsic_duration()));
+		formatter.list_item(fmt::format("Entry point: {}", asset->entry_point().get_value_or(0)));
+		formatter.list_item(fmt::format("Duration: {}", asset->duration().get_value_or(0)));
 		if (asset->annotation_text()) {
-			formatter.list_item(String::compose("Annotation text: %1", *asset->annotation_text()));
+			formatter.list_item(fmt::format("Annotation text: {}", *asset->annotation_text()));
 		}
 	};
 
@@ -115,14 +114,14 @@ verify_report(dcp::VerificationResult const& result, Formatter& formatter)
 			formatter.list_item(fmt::format("CPL ID: {}", formatter.fixed_width()(cpl->id())));
 			int reel_index = 1;
 			for (auto reel: cpl->reels()) {
-				formatter.list_item(String::compose("Reel: %1", reel_index++));
+				formatter.list_item(fmt::format("Reel: {}", reel_index++));
 				auto ul2 = formatter.unordered_list();
 				if (auto pic = reel->main_picture()) {
 					formatter.list_item("Main picture");
 					auto ul3 = formatter.unordered_list();
 					reel_asset_details(pic);
-					formatter.list_item(String::compose("Frame rate: %1", pic->frame_rate().numerator));
-					formatter.list_item(String::compose("Screen aspect ratio: %1x%2", pic->screen_aspect_ratio().numerator, pic->screen_aspect_ratio().denominator));
+					formatter.list_item(fmt::format("Frame rate: {}", pic->frame_rate().numerator));
+					formatter.list_item(fmt::format("Screen aspect ratio: {}x{}", pic->screen_aspect_ratio().numerator, pic->screen_aspect_ratio().denominator));
 				}
 				if (auto sound = reel->main_sound()) {
 					formatter.list_item("Main sound");
@@ -134,7 +133,7 @@ verify_report(dcp::VerificationResult const& result, Formatter& formatter)
 					auto ul3 = formatter.unordered_list();
 					reel_asset_details(sub);
 					if (sub->language()) {
-						formatter.list_item(String::compose("Language: %1", *sub->language()));
+						formatter.list_item(fmt::format("Language: {}", *sub->language()));
 					}
 				}
 			}

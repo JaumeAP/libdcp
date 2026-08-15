@@ -172,7 +172,7 @@ File::checked_read(void* ptr, size_t size)
 			if (errno == EINTR) {
 				continue;
 			}
-			throw FileError("read error %1", _path, errno);
+			throw FileError("read error", _path, errno);
 		}
 		if (N == 0) {
 			throw FileError("Unexpected end of file", _path, 0);

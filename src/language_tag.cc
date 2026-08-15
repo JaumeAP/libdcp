@@ -37,11 +37,11 @@
  */
 
 
-#include "compose.hpp"
 #include "dcp_assert.h"
 #include "exceptions.h"
 #include "file.h"
 #include "language_tag.h"
+#include <fmt/format.h>
 #include <boost/algorithm/string.hpp>
 #include <string>
 
@@ -83,7 +83,7 @@ LanguageTag::Subtag::Subtag (string subtag, SubtagType type)
 	: _subtag (subtag)
 {
 	if (!get_subtag_data(type, subtag)) {
-		throw LanguageTagError(String::compose("Unknown %1 string %2", subtag_type_name(type), subtag));
+		throw LanguageTagError(fmt::format("Unknown {} string {}", subtag_type_name(type), subtag));
 	}
 }
 
@@ -93,7 +93,7 @@ LanguageTag::LanguageTag (string tag)
 	vector<string> parts;
 	boost::split (parts, tag, boost::is_any_of("-"));
 	if (parts.empty()) {
-		throw LanguageTagError (String::compose("Could not parse language tag %1", tag));
+		throw LanguageTagError(fmt::format("Could not parse language tag {}", tag));
 	}
 
 	vector<string>::size_type p = 0;
@@ -143,7 +143,7 @@ LanguageTag::LanguageTag (string tag)
 	} catch (...) {}
 
 	if (p < parts.size()) {
-		throw LanguageTagError (String::compose("Unrecognised subtag %1", parts[p]));
+		throw LanguageTagError(fmt::format("Unrecognised subtag {}", parts[p]));
 	}
 }
 
@@ -202,7 +202,7 @@ void
 LanguageTag::add_variant (VariantSubtag variant)
 {
 	if (find(_variants.begin(), _variants.end(), variant) != _variants.end()) {
-		throw LanguageTagError (String::compose("Duplicate Variant subtag %1", variant.subtag()));
+		throw LanguageTagError(fmt::format("Duplicate Variant subtag {}", variant.subtag()));
 	}
 
 	_variants.push_back (variant);
@@ -218,7 +218,7 @@ check_for_duplicates (vector<T> const& subtags, dcp::LanguageTag::SubtagType typ
 	optional<T> last;
 	for (auto const& i: sorted) {
 		if (last && i == *last) {
-			throw LanguageTagError (String::compose("Duplicate %1 subtag %2", dcp::LanguageTag::subtag_type_name(type), i.subtag()));
+			throw LanguageTagError(fmt::format("Duplicate {} subtag {}", dcp::LanguageTag::subtag_type_name(type), i.subtag()));
 		}
 		last = i;
 	}
@@ -237,7 +237,7 @@ void
 LanguageTag::add_extlang (ExtlangSubtag extlang)
 {
 	if (find(_extlangs.begin(), _extlangs.end(), extlang) != _extlangs.end()) {
-		throw LanguageTagError (String::compose("Duplicate Extlang subtag %1", extlang.subtag()));
+		throw LanguageTagError(fmt::format("Duplicate Extlang subtag {}", extlang.subtag()));
 	}
 
 	_extlangs.push_back (extlang);

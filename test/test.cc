@@ -34,7 +34,6 @@
 
 #define BOOST_TEST_MODULE libdcp_test
 
-#include "compose.hpp"
 #include "cpl.h"
 #include "dcp.h"
 #include "interop_text_asset.h"
@@ -67,6 +66,7 @@ LIBDCP_ENABLE_WARNINGS
 LIBDCP_DISABLE_WARNINGS
 #include <libxml++/libxml++.h>
 LIBDCP_ENABLE_WARNINGS
+#include <fmt/format.h>
 #include <boost/algorithm/string.hpp>
 #include <boost/test/unit_test.hpp>
 #include <cstdio>
@@ -244,7 +244,7 @@ check_file (boost::filesystem::path ref, boost::filesystem::path check)
 				if (ref_buffer[i] != check_buffer[i]) {
 					BOOST_CHECK_MESSAGE (
 						false,
-						dcp::String::compose("File %1 differs from reference %2 at offset %3", check, ref, pos + i)
+						fmt::format("File {} differs from reference {} at offset {}", check.string(), ref.string(), pos + i)
 						);
 					break;
 				}
@@ -283,7 +283,7 @@ simple_picture (boost::filesystem::path path, string suffix, int frames, optiona
 	if (key) {
 		mp->set_key (*key);
 	}
-	auto picture_writer = mp->start_write(path / dcp::String::compose("video%1.mxf", suffix), dcp::Behaviour::MAKE_NEW);
+	auto picture_writer = mp->start_write(path / fmt::format("video{}.mxf", suffix), dcp::Behaviour::MAKE_NEW);
 
 	dcp::Size const size (1998, 1080);
 	auto image = make_shared<dcp::OpenJPEGImage>(size);
@@ -311,7 +311,7 @@ simple_sound(boost::filesystem::path path, string suffix, dcp::MXFMetadata mxf_m
 	}
 	ms->_language = language;
 	ms->set_metadata (mxf_meta);
-	auto sound_writer = ms->start_write(path / dcp::String::compose("audio%1.mxf", suffix), {}, dcp::SoundAsset::AtmosSync::DISABLED, dcp::SoundAsset::MCASubDescriptors::ENABLED);
+	auto sound_writer = ms->start_write(path / fmt::format("audio{}.mxf", suffix), {}, dcp::SoundAsset::AtmosSync::DISABLED, dcp::SoundAsset::MCASubDescriptors::ENABLED);
 
 	int const samples_per_frame = sample_rate / 24;
 
@@ -364,7 +364,7 @@ make_simple (boost::filesystem::path path, int reels, int frames, dcp::Standard 
 	cpl->set_version_number(1);
 
 	for (int i = 0; i < reels; ++i) {
-		string suffix = reels == 1 ? "" : dcp::String::compose("%1", i);
+		string suffix = reels == 1 ? "" : fmt::to_string(i);
 
 		auto mp = simple_picture (path, suffix, frames, key);
 		auto ms = simple_sound (path, suffix, mxf_meta, "en-US", frames, sample_rate, key);

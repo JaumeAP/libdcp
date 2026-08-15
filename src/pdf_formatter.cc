@@ -269,7 +269,7 @@ std::function<std::string (std::string)>
 PDFFormatter::fixed_width()
 {
 	return [](std::string s) {
-		return String::compose("[fixed]%1[/fixed]", s);
+		return fmt::format("[fixed]{}[/fixed]", s);
 	};
 }
 

@@ -37,8 +37,8 @@
  */
 
 
-#include "compose.hpp"
 #include "text_string.h"
+#include <fmt/format.h>
 #include <cmath>
 
 
@@ -204,62 +204,62 @@ TextString::equals(shared_ptr<const Text> other_sub, EqualityOptions const& opti
 	bool same = true;
 
 	if (_font != other->_font) {
-		note(NoteType::ERROR, String::compose("text font differs: %1 vs %2", _font.get_value_or("[none]"), other->_font.get_value_or("[none]")));
+		note(NoteType::ERROR, fmt::format("text font differs: {} vs {}", _font.get_value_or("[none]"), other->_font.get_value_or("[none]")));
 		same = false;
 	}
 
 	if (_italic != other->_italic) {
-		note(NoteType::ERROR, String::compose("text italic flag differs: %1 vs %2", _italic ? "true" : "false", other->_italic ? "true" : "false"));
+		note(NoteType::ERROR, fmt::format("text italic flag differs: {} vs {}", _italic ? "true" : "false", other->_italic ? "true" : "false"));
 		same = false;
 	}
 
 	if (_bold != other->_bold) {
-		note(NoteType::ERROR, String::compose("text bold flag differs: %1 vs %2", _bold ? "true" : "false", other->_bold ? "true" : "false"));
+		note(NoteType::ERROR, fmt::format("text bold flag differs: {} vs {}", _bold ? "true" : "false", other->_bold ? "true" : "false"));
 		same = false;
 	}
 
 	if (_underline != other->_underline) {
-		note(NoteType::ERROR, String::compose("text underline flag differs: %1 vs %2", _underline ? "true" : "false", other->_underline ? "true" : "false"));
+		note(NoteType::ERROR, fmt::format("text underline flag differs: {} vs {}", _underline ? "true" : "false", other->_underline ? "true" : "false"));
 		same = false;
 	}
 
 	if (_colour != other->_colour) {
-		note(NoteType::ERROR, String::compose("text colour differs: %1 vs %2", _colour.to_rgb_string(), other->_colour.to_rgb_string()));
+		note(NoteType::ERROR, fmt::format("text colour differs: {} vs {}", _colour.to_rgb_string(), other->_colour.to_rgb_string()));
 		same = false;
 	}
 
 	if (_size != other->_size) {
-		note(NoteType::ERROR, String::compose("text size differs: %1 vs %2", _size, other->_size));
+		note(NoteType::ERROR, fmt::format("text size differs: {} vs {}", _size, other->_size));
 		same = false;
 	}
 
 	if (_aspect_adjust != other->_aspect_adjust) {
-		note(NoteType::ERROR, String::compose("text aspect_adjust differs: %1 vs %2", _aspect_adjust, other->_aspect_adjust));
+		note(NoteType::ERROR, fmt::format("text aspect_adjust differs: {} vs {}", _aspect_adjust, other->_aspect_adjust));
 		same = false;
 	}
 
 	if (_direction != other->_direction) {
-		note(NoteType::ERROR, String::compose("text direction differs: %1 vs %2", direction_to_string(_direction), direction_to_string(other->_direction)));
+		note(NoteType::ERROR, fmt::format("text direction differs: {} vs {}", direction_to_string(_direction), direction_to_string(other->_direction)));
 		same = false;
 	}
 
 	if (_text != other->_text) {
-		note(NoteType::ERROR, String::compose("text text differs: %1 vs %2", _text, other->_text));
+		note(NoteType::ERROR, fmt::format("text text differs: {} vs {}", _text, other->_text));
 		same = false;
 	}
 
 	if (_effect != other->_effect) {
-		note(NoteType::ERROR, String::compose("text effect differs: %1 vs %2", effect_to_string(_effect), effect_to_string(other->_effect)));
+		note(NoteType::ERROR, fmt::format("text effect differs: {} vs {}", effect_to_string(_effect), effect_to_string(other->_effect)));
 		same = false;
 	}
 
 	if (_effect_colour != other->_effect_colour) {
-		note(NoteType::ERROR, String::compose("text effect colour differs: %1 vs %2", _effect_colour.to_rgb_string(), other->_effect_colour.to_rgb_string()));
+		note(NoteType::ERROR, fmt::format("text effect colour differs: {} vs {}", _effect_colour.to_rgb_string(), other->_effect_colour.to_rgb_string()));
 		same = false;
 	}
 
 	if (_space_before != other->_space_before) {
-		note(NoteType::ERROR, String::compose("text space before differs: %1 vs %2", _space_before, other->_space_before));
+		note(NoteType::ERROR, fmt::format("text space before differs: {} vs {}", _space_before, other->_space_before));
 		same = false;
 	}
 

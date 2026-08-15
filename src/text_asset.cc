@@ -37,7 +37,6 @@
  */
 
 
-#include "compose.hpp"
 #include "dcp_assert.h"
 #include "load_font_node.h"
 #include "raw_convert.h"
@@ -50,6 +49,7 @@
 #include <asdcp/AS_DCP.h>
 #include <asdcp/KM_util.h>
 #include <libxml++/nodes/element.h>
+#include <fmt/format.h>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/shared_array.hpp>
@@ -88,7 +88,7 @@ string_attribute (xmlpp::Element const * node, string name)
 {
 	auto a = node->get_attribute (name);
 	if (!a) {
-		throw XMLError (String::compose ("missing attribute %1", name));
+		throw XMLError(fmt::format("missing attribute {}", name));
 	}
 	return string (a->get_value ());
 }
@@ -654,7 +654,7 @@ TextAsset::equals(shared_ptr<const Asset> other_asset, EqualityOptions const& op
 	}
 
 	if (_texts.size() != other->_texts.size()) {
-		note (NoteType::ERROR, String::compose("different number of texts: %1 vs %2", _texts.size(), other->_texts.size()));
+		note(NoteType::ERROR, fmt::format("different number of texts: {} vs {}", _texts.size(), other->_texts.size()));
 		return false;
 	}
 
@@ -977,7 +977,7 @@ format_xml_node (xmlpp::Node const* node, State& state)
 		state.xml += "<" + element->get_name();
 
 		for (auto attribute: element->get_attributes()) {
-			state.xml += String::compose(" %1=\"%2\"", attribute->get_name().raw(), attribute->get_value().raw());
+			state.xml += fmt::format(" {}=\"{}\"", attribute->get_name().raw(), attribute->get_value().raw());
 		}
 
 		if (children.empty()) {
@@ -997,7 +997,7 @@ format_xml_node (xmlpp::Node const* node, State& state)
 				state.xml += "\n" + string(state.indent * 2, ' ');
 			}
 
-			state.xml += String::compose("</%1>", element->get_name().raw());
+			state.xml += fmt::format("</{}>", element->get_name().raw());
 
 			if (should_disable_formatting) {
 				--state.disable_formatting;
@@ -1027,14 +1027,14 @@ TextAsset::format_xml(xmlpp::Document const& document, optional<pair<string, str
 
 	if (xml_namespace) {
 		if (xml_namespace->first.empty()) {
-			state.xml += String::compose(" xmlns=\"%1\"", xml_namespace->second);
+			state.xml += fmt::format(" xmlns=\"{}\"", xml_namespace->second);
 		} else {
-			state.xml += String::compose(" xmlns:%1=\"%2\"", xml_namespace->first, xml_namespace->second);
+			state.xml += fmt::format(" xmlns:{}=\"{}\"", xml_namespace->first, xml_namespace->second);
 		}
 	}
 
 	for (auto attribute: root->get_attributes()) {
-		state.xml += String::compose(" %1=\"%2\"", attribute->get_name().raw(), attribute->get_value().raw());
+		state.xml += fmt::format(" {}=\"{}\"", attribute->get_name().raw(), attribute->get_value().raw());
 	}
 
 	state.xml += ">";
@@ -1043,7 +1043,7 @@ TextAsset::format_xml(xmlpp::Document const& document, optional<pair<string, str
 		format_xml_node(child, state);
 	}
 
-	state.xml += String::compose("\n</%1>\n", root->get_name().raw());
+	state.xml += fmt::format("\n</{}>\n", root->get_name().raw());
 
 	return state.xml;
 }

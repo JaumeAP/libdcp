@@ -38,8 +38,8 @@
 
 
 #include "local_time.h"
-#include "compose.hpp"
 #include "version.h"
+#include <fmt/format.h>
 #include <boost/filesystem.hpp>
 #include <memory>
 
@@ -53,10 +53,10 @@ class CertificateChain;
 void combine(
 	std::vector<boost::filesystem::path> inputs,
 	boost::filesystem::path output,
-	std::string issuer = String::compose("libdcp %1", dcp::version),
-	std::string creator = String::compose("libdcp %1", dcp::version),
+	std::string issuer = fmt::format("libdcp {}", dcp::version),
+	std::string creator = fmt::format("libdcp {}", dcp::version),
 	std::string issue_date = LocalTime().as_string(),
-	std::string annotation_text = String::compose("Created by libdcp %1", dcp::version),
+	std::string annotation_text = fmt::format("Created by libdcp {}", dcp::version),
 	std::shared_ptr<const CertificateChain> signer = std::shared_ptr<CertificateChain>()
 	);
 

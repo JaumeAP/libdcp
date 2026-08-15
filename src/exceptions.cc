@@ -37,7 +37,6 @@
  */
 
 
-#include "compose.hpp"
 #include "exceptions.h"
 #include <fmt/format.h>
 
@@ -49,7 +48,7 @@ using namespace dcp;
 
 
 FileError::FileError (string message, boost::filesystem::path filename, int number)
-	: runtime_error (String::compose ("%1 (%2) (error %3)", message, filename.string(), number))
+	: runtime_error(fmt::format("{} ({}) (error {})", message, filename.string(), number))
 	, _filename (filename)
 	, _number (number)
 {
@@ -58,49 +57,49 @@ FileError::FileError (string message, boost::filesystem::path filename, int numb
 
 
 UnresolvedRefError::UnresolvedRefError (string id)
-	: runtime_error (String::compose ("Unresolved reference to asset id %1", id))
+	: runtime_error(fmt::format("Unresolved reference to asset id {}", id))
 {
 
 }
 
 
 TimeFormatError::TimeFormatError (string bad_time)
-	: runtime_error (String::compose ("Bad time string %1", bad_time))
+	: runtime_error(fmt::format("Bad time string {}", bad_time))
 {
 
 }
 
 
 BadContentKindError::BadContentKindError (string content_kind)
-	: ReadError (String::compose("Bad content kind '%1'", content_kind))
+	: ReadError(fmt::format("Bad content kind '{}'", content_kind))
 {
 
 }
 
 
 NotEncryptedError::NotEncryptedError (string const & what)
-	: runtime_error (String::compose ("%1 is not encrypted", what))
+	: runtime_error(fmt::format("{} is not encrypted", what))
 {
 
 }
 
 
 ProgrammingError::ProgrammingError (string file, int line)
-	: runtime_error (String::compose ("Programming error at %1:%2", file, line))
+	: runtime_error(fmt::format("Programming error at {}:{}", file, line))
 {
 
 }
 
 
 KDMDecryptionError::KDMDecryptionError (std::string message, int cipher_length, int modulus_dmax)
-	: runtime_error (String::compose ("Could not decrypt KDM (%1) (%2/%3)", message, cipher_length, modulus_dmax))
+	: runtime_error(fmt::format("Could not decrypt KDM ({}) ({}/{})", message, cipher_length, modulus_dmax))
 {
 
 }
 
 
 KDMFormatError::KDMFormatError (std::string message)
-	: runtime_error (String::compose ("Could not parse KDM (%1)", message))
+	: runtime_error(fmt::format("Could not parse KDM ({})", message))
 {
 
 }
@@ -114,7 +113,7 @@ CertificateChainError::CertificateChainError (string message)
 
 
 ReadError::ReadError (string message, string detail)
-	: runtime_error(String::compose("%1 (%2)", message, detail))
+	: runtime_error(fmt::format("{} ({})", message, detail))
 	, _message(message)
 	, _detail(detail)
 {
@@ -123,7 +122,7 @@ ReadError::ReadError (string message, string detail)
 
 
 MissingTextImageError::MissingTextImageError (string id)
-	: runtime_error (String::compose("Could not load image for subtitle/caption %1", id))
+	: runtime_error(fmt::format("Could not load image for subtitle/caption {}", id))
 {
 
 }
@@ -142,7 +141,7 @@ BadKDMDateError::BadKDMDateError (bool starts_too_early)
 
 
 StartCompressionError::StartCompressionError (optional<int> code)
-	: runtime_error (String::compose("Could not start JPEG2000 encoding%1", code ? String::compose(" (%1)", *code) : ""))
+	: runtime_error(fmt::format("Could not start JPEG2000 encoding{}", code ? fmt::format(" ({})", *code) : ""))
 	, _code (code)
 {}
 
@@ -173,7 +172,7 @@ DuplicateIdError::DuplicateIdError (std::string message)
 
 
 MainSoundConfigurationError::MainSoundConfigurationError (std::string s)
-	: runtime_error (String::compose("Could not parse MainSoundConfiguration %1", s))
+	: runtime_error(fmt::format("Could not parse MainSoundConfiguration {}", s))
 {
 
 }
@@ -187,7 +186,7 @@ NoReelsError::NoReelsError ()
 
 
 MissingAssetmapError::MissingAssetmapError (boost::filesystem::path dir)
-	: ReadError (String::compose("Could not find ASSETMAP nor ASSETMAP.xml in '%1'", dir.string()))
+	: ReadError(fmt::format("Could not find ASSETMAP nor ASSETMAP.xml in '{}'", dir.string()))
 {
 
 }
@@ -201,7 +200,7 @@ InconsistentValidityPeriodError::InconsistentValidityPeriodError()
 
 
 BadURNUUIDError::BadURNUUIDError(string bad_id)
-	: runtime_error(String::compose("Badly-formed URN UUID %1", bad_id))
+	: runtime_error(fmt::format("Badly-formed URN UUID {}", bad_id))
 {
 
 }

@@ -38,7 +38,6 @@
 
 
 #include "certificate_chain.h"
-#include "compose.hpp"
 #include "cpl.h"
 #include "dcp_assert.h"
 #include "decrypted_kdm.h"
@@ -53,14 +52,11 @@
 #include <openssl/rsa.h>
 #include <openssl/pem.h>
 #include <openssl/err.h>
+#include <fmt/format.h>
 
 
-using std::list;
 using std::vector;
 using std::string;
-using std::setw;
-using std::setfill;
-using std::hex;
 using std::pair;
 using std::map;
 using std::shared_ptr;
@@ -381,7 +377,7 @@ DecryptedKDM::encrypt (
 		std::vector<unsigned char> encrypted(RSA_size(rsa));
 		int const encrypted_len = RSA_public_encrypt(p - block, block, encrypted.data(), rsa, RSA_PKCS1_OAEP_PADDING);
 		if (encrypted_len == -1) {
-			throw MiscError (String::compose ("Could not encrypt KDM (%1)", ERR_error_string (ERR_get_error(), 0)));
+			throw MiscError(fmt::format("Could not encrypt KDM ({})", ERR_error_string (ERR_get_error(), 0)));
 		}
 
 		/* Lazy overallocation */

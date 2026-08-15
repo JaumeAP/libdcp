@@ -20,6 +20,7 @@
 
 
 #include "html_formatter.h"
+#include <fmt/format.h>
 #include <boost/filesystem.hpp>
 
 
@@ -98,9 +99,9 @@ void
 HTMLFormatter::list_item(std::string const& text, boost::optional<std::string> type)
 {
 	if (type) {
-		_file.puts(dcp::String::compose("<li class=\"%1\">%2</li>\n", *type, text).c_str());
+		_file.puts(fmt::format("<li class=\"{}\">{}</li>\n", *type, text).c_str());
 	} else {
-		_file.puts(dcp::String::compose("<li>%1</li>\n", text).c_str());
+		_file.puts(fmt::format("<li>{}</li>\n", text).c_str());
 	}
 }
 
@@ -120,7 +121,7 @@ std::function<std::string (std::string)>
 HTMLFormatter::fixed_width()
 {
 	return [](std::string s) {
-		return String::compose("<code>%1</code>", s);
+		return fmt::format("<code>{}</code>", s);
 	};
 }
 
@@ -128,14 +129,14 @@ HTMLFormatter::fixed_width()
 void
 HTMLFormatter::tagged(std::string tag, std::string content)
 {
-	_file.puts(String::compose("<%1>%2</%3>\n", tag, content, tag).c_str());
+	_file.puts(fmt::format("<{}>{}</{}>\n", tag, content, tag).c_str());
 }
 
 
 unique_ptr<Formatter::Wrap>
 HTMLFormatter::wrapped(std::string const& tag)
 {
-	_file.puts(String::compose("<%1>", tag).c_str());
-	return unique_ptr<Formatter::Wrap>(new Wrap(this, String::compose("</%1>", tag)));
+	_file.puts(fmt::format("<{}>", tag).c_str());
+	return unique_ptr<Formatter::Wrap>(new Wrap(this, fmt::format("</{}>", tag)));
 }
 

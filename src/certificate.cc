@@ -38,7 +38,6 @@
 
 
 #include "certificate.h"
-#include "compose.hpp"
 #include "exceptions.h"
 #include "util.h"
 #include "dcp_assert.h"
@@ -48,6 +47,7 @@
 #include <openssl/ssl.h>
 #include <openssl/asn1.h>
 #include <openssl/err.h>
+#include <fmt/format.h>
 #include <boost/algorithm/string.hpp>
 #include <iostream>
 #include <algorithm>
@@ -487,7 +487,7 @@ Certificate::public_key () const
 
 	_public_key = EVP_PKEY_get1_RSA (key);
 	if (!_public_key) {
-		throw MiscError (String::compose ("could not get RSA public key (%1)", ERR_error_string (ERR_get_error(), 0)));
+		throw MiscError(fmt::format("could not get RSA public key ({})", ERR_error_string (ERR_get_error(), 0)));
 	}
 
 	return _public_key;

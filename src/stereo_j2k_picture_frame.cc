@@ -37,7 +37,6 @@
  */
 
 
-#include "compose.hpp"
 #include "crypto_context.h"
 #include "j2k_transcode.h"
 #include "rgb_xyz.h"
@@ -45,6 +44,7 @@
 #include "util.h"
 #include <asdcp/AS_DCP.h>
 #include <asdcp/KM_fileio.h>
+#include <fmt/format.h>
 
 
 using std::string;
@@ -100,7 +100,7 @@ StereoJ2KPictureFrame::StereoJ2KPictureFrame (ASDCP::JP2K::MXFSReader* reader, i
 	_buffer = make_shared<ASDCP::JP2K::SFrameBuffer>(4 * Kumu::Megabyte);
 
 	if (ASDCP_FAILURE (reader->ReadFrame (n, *_buffer, c->context(), check_hmac ? c->hmac() : nullptr))) {
-		boost::throw_exception (ReadError (String::compose ("could not read video frame %1 of %2", n)));
+		boost::throw_exception(ReadError(fmt::format("could not read video frame {} of {}", n)));
 	}
 }
 

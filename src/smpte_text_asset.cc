@@ -37,7 +37,6 @@
  */
 
 
-#include "compose.hpp"
 #include "crypto_context.h"
 #include "dcp_assert.h"
 #include "equality_options.h"
@@ -123,9 +122,9 @@ SMPTETextAsset::SMPTETextAsset(boost::filesystem::path file)
 		} catch (cxml::Error& e) {
 			boost::throw_exception(
 				ReadError(
-					String::compose(
-						"Failed to read subtitle file %1; MXF failed with %2, XML failed with %3",
-						file, static_cast<int>(r), e.what()
+					fmt::format(
+						"Failed to read subtitle file {}; MXF failed with {}, XML failed with {}",
+						file.string(), static_cast<int>(r), e.what()
 						)
 					)
 				);
@@ -138,11 +137,11 @@ SMPTETextAsset::SMPTETextAsset(boost::filesystem::path file)
 			auto im = dynamic_pointer_cast<TextImage>(i);
 			if (im && im->png_image().size() == 0) {
 				/* Even more dubious; allow <id>.png or urn:uuid:<id>.png */
-				auto p = file.parent_path() / String::compose("%1.png", im->id());
+				auto p = file.parent_path() / fmt::format("{}.png", im->id());
 				if (filesystem::is_regular_file(p)) {
 					im->read_png_file(p);
 				} else if (starts_with(im->id(), "urn:uuid:")) {
-					p = file.parent_path() / String::compose("%1.png", remove_urn_uuid(im->id()));
+					p = file.parent_path() / fmt::format("{}.png", remove_urn_uuid(im->id()));
 					if (filesystem::is_regular_file(p)) {
 						im->read_png_file(p);
 					}
@@ -234,11 +233,11 @@ SMPTETextAsset::read_mxf_resources(shared_ptr<ASDCP::TimedText::MXFReader> reade
 		if (ASDCP_FAILURE(result)) {
 			switch (i->Type) {
 			case ASDCP::TimedText::MT_OPENTYPE:
-				throw ReadError(String::compose("Could not read font from MXF file (%1)", static_cast<int>(result)));
+				throw ReadError(fmt::format("Could not read font from MXF file ({})", static_cast<int>(result)));
 			case ASDCP::TimedText::MT_PNG:
-				throw ReadError(String::compose("Could not read subtitle image from MXF file (%1)", static_cast<int>(result)));
+				throw ReadError(fmt::format("Could not read subtitle image from MXF file ({})", static_cast<int>(result)));
 			default:
-				throw ReadError(String::compose("Could not read resource from MXF file (%1)", static_cast<int>(result)));
+				throw ReadError(fmt::format("Could not read resource from MXF file ({})", static_cast<int>(result)));
 			}
 		}
 
@@ -321,7 +320,7 @@ SMPTETextAsset::set_key(Key key)
 	if (ASDCP_FAILURE(r)) {
 		boost::throw_exception(
 			ReadError(
-				String::compose("Could not read encrypted subtitle MXF (%1)", static_cast<int>(r))
+				fmt::format("Could not read encrypted subtitle MXF ({})", static_cast<int>(r))
 				)
 			);
 	}
@@ -537,7 +536,7 @@ SMPTETextAsset::equals(shared_ptr<const Asset> other_asset, EqualityOptions cons
 	}
 
 	if (_language != other->_language) {
-		note(NoteType::ERROR, String::compose("Subtitle/caption languages differ (`%1' vs `%2')", _language.get_value_or("[none]"), other->_language.get_value_or("[none]")));
+		note(NoteType::ERROR, fmt::format("Subtitle/caption languages differ ('{}' vs '{}')", _language.get_value_or("[none]"), other->_language.get_value_or("[none]")));
 		return false;
 	}
 

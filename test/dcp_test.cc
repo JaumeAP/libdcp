@@ -33,7 +33,6 @@
 
 
 #include "atmos_asset.h"
-#include "compose.hpp"
 #include "cpl.h"
 #include "dcp.h"
 #include "equality_options.h"
@@ -53,6 +52,7 @@
 #include "test.h"
 #include <asdcp/KM_util.h>
 #include <sndfile.h>
+#include <fmt/format.h>
 #include <boost/bind/bind.hpp>
 #include <boost/test/unit_test.hpp>
 
@@ -529,7 +529,7 @@ BOOST_AUTO_TEST_CASE(hashes_preserved_when_loading_corrupted_dcp)
 			new_hash = 'A' + asset_1_hash.substr(1);
 		}
 
-		editor.insert(after, dcp::String::compose("      <Hash>%1</Hash>", new_hash));
+		editor.insert(after, fmt::format("      <Hash>{}</Hash>", new_hash));
 	}
 
 	dcp::DCP read_back(dir / "1");

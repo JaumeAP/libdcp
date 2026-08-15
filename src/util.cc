@@ -38,7 +38,6 @@
 
 
 #include "certificate.h"
-#include "compose.hpp"
 #include "dcp_assert.h"
 #include "exceptions.h"
 #include "file.h"
@@ -60,6 +59,7 @@
 #include <libxml++/nodes/element.h>
 #include <libxml++/document.h>
 #include <openssl/sha.h>
+#include <fmt/format.h>
 #include <boost/algorithm/string.hpp>
 #if BOOST_VERSION >= 106100
 #include <boost/dll/runtime_symbol_info.hpp>
@@ -256,7 +256,7 @@ dcp::file_to_string (boost::filesystem::path p, uintmax_t max_length)
 {
 	auto len = filesystem::file_size(p);
 	if (len > max_length) {
-		throw MiscError (String::compose("Unexpectedly long file (%1)", p.string()));
+		throw MiscError(fmt::format("Unexpectedly long file ({})", p.string()));
 	}
 
 	File f(p, "r");
@@ -399,7 +399,7 @@ dcp::unique_string (vector<string> existing, string base)
 {
 	int const max_tries = existing.size() + 1;
 	for (int i = 0; i < max_tries; ++i) {
-		string trial = String::compose("%1%2", base, i);
+		string trial = fmt::format("{}{}", base, i);
 		if (find(existing.begin(), existing.end(), trial) == existing.end()) {
 			return trial;
 		}
