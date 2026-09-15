@@ -33,6 +33,7 @@
 
 
 #include "common.h"
+#include "dcp_assert.h"
 #include "filesystem.h"
 #include "html_formatter.h"
 #ifdef LIBDCP_HAVE_HARU
