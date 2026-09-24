@@ -237,7 +237,15 @@ seek_function (OPJ_OFF_T nb_bytes, void* data)
 
 
 ArrayData
-dcp::compress_j2k (shared_ptr<const OpenJPEGImage> xyz, int bandwidth, int frames_per_second, bool threed, bool fourk, string comment)
+dcp::compress_j2k(
+	shared_ptr<const OpenJPEGImage> xyz,
+	int bandwidth,
+	int frames_per_second,
+	bool threed,
+	bool fourk,
+	string comment,
+	bool metal
+	)
 {
 	/* get a J2K compressor handle */
 	auto encoder = opj_create_compress (OPJ_CODEC_J2K);
@@ -277,11 +285,22 @@ dcp::compress_j2k (shared_ptr<const OpenJPEGImage> xyz, int bandwidth, int frame
 	/* Setup the encoder parameters using the current image and user parameters */
 	opj_setup_encoder (encoder, &parameters, xyz->opj_image());
 
+	std::vector<char const*> extra_options;
+
 #ifndef LIBDCP_HAVE_NUMGBITS
 	string numgbits = fmt::format("GUARD_BITS={}", fourk ? 2 : 1);
-	char const* extra_options[] = { numgbits.c_str(), nullptr };
-	opj_encoder_set_extra_options(encoder, extra_options);
+	extra_options.push_back(numgbits.c_str());
 #endif
+
+	string enable_metal = "METAL_T1=YES";
+	if (metal) {
+		extra_options.push_back(enable_metal.c_str());
+	}
+
+	if (!extra_options.empty()) {
+		extra_options.push_back(nullptr);
+		opj_encoder_set_extra_options(encoder, extra_options.data());
+	}
 
 	auto stream = opj_stream_default_create (OPJ_FALSE);
 	if (!stream) {
