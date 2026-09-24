@@ -60,7 +60,7 @@ def dependencies(target, options, for_package):
         # Use distro-provided FFmpeg and openjpeg on Arch (except when packaging), otherwise our own
         if options['mpeg2']:
             deps.append(('ffmpeg', 'a102f022012a522e1c784b00200fe213366bbbe4', ffmpeg_options))
-        deps.append(('openjpeg', '92f8747304d7743aa62a5daac20513fa67c4bfbf'))
+        deps.append(('openjpeg', '67066820bf8c27e12d2596153c29b681d1143380'))
 
     return deps
 
