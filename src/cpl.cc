@@ -107,8 +107,10 @@ CPL::CPL(string annotation_text, ContentKind content_kind, Standard standard, Pr
 	_content_versions.push_back(cv);
 
 	/* SMPTE Bv2.1 8.6.3 */
-	string const profile_value = _profile == Profile::SMPTE_BV20 ? "2.0" : "2.1";
-	set_extension_metadata_value(profile_scope, profile_name, profile_tag, fmt::format("SMPTE-RDD-52:2020-Bv{}", profile_value));
+	if (_profile != Profile::SMPTE_A) {
+		string const profile_value = _profile == Profile::SMPTE_BV20 ? "2.0" : "2.1";
+		set_extension_metadata_value(profile_scope, profile_name, profile_tag, fmt::format("SMPTE-RDD-52:2020-Bv{}", profile_value));
+	}
 }
 
 
