@@ -93,6 +93,7 @@ def build(bld):
              openjpeg_image.cc
              picture_asset.cc
              pkl.cc
+             profile.cc
              rating.cc
              raw_convert.cc
              reel.cc

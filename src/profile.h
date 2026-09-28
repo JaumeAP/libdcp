@@ -32,6 +32,13 @@
 */
 
 
+#ifndef LIBDCP_PROFILE_H
+#define LIBDCP_PROFILE_H
+
+
+#include <string>
+
+
 namespace dcp {
 
 
@@ -43,5 +50,12 @@ enum class Profile
 };
 
 
+dcp::Profile string_to_profile(std::string const& profile);
+std::string profile_to_string(Profile profile);
+
+
 }
+
+
+#endif
 
