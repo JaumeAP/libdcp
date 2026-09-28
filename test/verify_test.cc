@@ -5450,7 +5450,7 @@ BOOST_AUTO_TEST_CASE(verify_invalid_tile_part_size)
 	int component_sizes[] = {
 		1321816,
 		1294414,
-		1289881,
+		1289780,
 	};
 
 	for (auto frame = 0; frame < 24; frame++) {
