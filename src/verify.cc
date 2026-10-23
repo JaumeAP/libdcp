@@ -1646,6 +1646,10 @@ verify_cpl(Context& context, shared_ptr<const CPL> cpl)
 	size_t fewest_closed_captions = SIZE_MAX;
 	/* most number of closed caption assets seen in a reel */
 	size_t most_closed_captions = 0;
+	/* set to true if any reel has an Atmos asset */
+	auto have_atmos = false;
+	/* set to true if any reel has no Atmos asset */
+	auto have_no_atmos = false;
 	map<Marker, Time> markers_seen;
 
 	auto const main_picture_active_area = cpl->main_picture_active_area();
@@ -1690,6 +1694,11 @@ verify_cpl(Context& context, shared_ptr<const CPL> cpl)
 			&fewest_closed_captions,
 			&markers_seen
 			);
+		if (reel->atmos()) {
+			have_atmos = true;
+		} else {
+			have_no_atmos = true;
+		}
 		frame += reel->duration();
 		++reel_index;
 	}
@@ -1714,6 +1723,10 @@ verify_cpl(Context& context, shared_ptr<const CPL> cpl)
 
 		if (fewest_closed_captions != most_closed_captions) {
 			context.add_note(VerificationNote::Code::MISMATCHED_CLOSED_CAPTION_ASSET_COUNTS);
+		}
+
+		if (have_atmos && have_no_atmos) {
+			context.add_note(VerificationNote::Code::MISSING_ATMOS_FROM_SOME_REELS);
 		}
 
 		if (cpl->content_kind() == ContentKind::FEATURE) {
@@ -2216,6 +2229,8 @@ dcp::note_to_string(VerificationNote note, function<string (string)> process_str
 		return compose("The CPL %1 has no <ContentVersion> tag", note.cpl_id().get());
 	case VerificationNote::Code::INVALID_PKL_NAMESPACE:
 		return compose("The namespace %1 in PKL %2 is invalid", *note.xml_namespace(), note.file()->filename());
+	case VerificationNote::Code::MISSING_ATMOS_FROM_SOME_REELS:
+		return process_string("At least one reel contains an Atmos asset, but some reel(s) do not.");
 	}
 
 	return "";
@@ -2349,6 +2364,7 @@ dcp::VerificationNote::type() const
 	case Code::THREED_ASSET_MARKED_AS_TWOD:
 	case Code::INVALID_SUBTITLE_DURATION_BV21:
 	case Code::INVALID_CLOSED_CAPTION_XML_SIZE_IN_BYTES:
+	case Code::MISSING_ATMOS_FROM_SOME_REELS:
 		return Type::WARNING;
 	};
 

@@ -32,6 +32,8 @@
 */
 
 
+#include "atmos_asset.h"
+#include "atmos_asset_writer.h"
 #include "combine.h"
 #include "compose.hpp"
 #include "cpl.h"
@@ -44,6 +46,7 @@
 #include "openjpeg_image.h"
 #include "raw_convert.h"
 #include "reel.h"
+#include "reel_atmos_asset.h"
 #include "reel_interop_text_asset.h"
 #include "reel_markers_asset.h"
 #include "reel_mono_picture_asset.h"
@@ -3665,6 +3668,118 @@ BOOST_AUTO_TEST_CASE (verify_missing_main_subtitle_from_some_reels)
 				note(VC::CORRECT_PICTURE_HASH, canonical(dir / "video2.mxf"), cpl).set_reel_index(1).set_asset_id(picture_ids[1]),
 				VN(VC::MISSING_CPL_METADATA, cpl->file().get()).set_cpl_id(cpl->id())
 			});
+	}
+}
+
+
+/** Make an Atmos asset of the given length; the content of the frames is not important here */
+static
+shared_ptr<dcp::AtmosAsset>
+simple_atmos(path dir, string suffix, int frames)
+{
+	auto asset = make_shared<dcp::AtmosAsset>(dcp::Fraction(24, 1), 0, 10, 118, 1);
+	auto writer = asset->start_write(dir / ("atmos" + suffix + ".mxf"));
+	std::vector<uint8_t> frame(256, 0);
+	for (int i = 0; i < frames; ++i) {
+		writer->write(frame.data(), frame.size());
+	}
+	writer->finalize();
+	return asset;
+}
+
+
+static
+shared_ptr<dcp::CPL>
+verify_atmos_should_be_in_all_reels_check(path dir, bool add_to_reel1, bool add_to_reel2)
+{
+	prepare_directory(dir);
+	auto dcp = make_shared<dcp::DCP>(dir);
+	auto cpl = make_shared<dcp::CPL>("A Test DCP", dcp::ContentKind::TRAILER, dcp::Standard::SMPTE);
+
+	auto constexpr reel_length = 192;
+
+	auto reel1 = make_shared<dcp::Reel>(
+		make_shared<dcp::ReelMonoPictureAsset>(simple_picture(dir, "1", reel_length), 0),
+		make_shared<dcp::ReelSoundAsset>(simple_sound(dir, "1", dcp::MXFMetadata(), "en-US", reel_length), 0)
+		);
+
+	if (add_to_reel1) {
+		reel1->add(make_shared<dcp::ReelAtmosAsset>(simple_atmos(dir, "1", reel_length), 0));
+	}
+
+	auto markers1 = make_shared<dcp::ReelMarkersAsset>(dcp::Fraction(24, 1), reel_length);
+	markers1->set(dcp::Marker::FFOC, dcp::Time(1, 24, 24));
+	reel1->add(markers1);
+
+	cpl->add(reel1);
+
+	auto reel2 = make_shared<dcp::Reel>(
+		make_shared<dcp::ReelMonoPictureAsset>(simple_picture(dir, "2", reel_length), 0),
+		make_shared<dcp::ReelSoundAsset>(simple_sound(dir, "2", dcp::MXFMetadata(), "en-US", reel_length), 0)
+		);
+
+	if (add_to_reel2) {
+		reel2->add(make_shared<dcp::ReelAtmosAsset>(simple_atmos(dir, "2", reel_length), 0));
+	}
+
+	auto markers2 = make_shared<dcp::ReelMarkersAsset>(dcp::Fraction(24, 1), reel_length);
+	markers2->set(dcp::Marker::LFOC, dcp::Time(reel_length - 1, 24, 24));
+	reel2->add(markers2);
+
+	cpl->add(reel2);
+
+	dcp->add(cpl);
+	dcp->set_annotation_text("A Test DCP");
+	dcp->write_xml();
+
+	return cpl;
+}
+
+
+/** SMPTE ST 429-19 says that each reel of a DCP with immersive audio should have it */
+BOOST_AUTO_TEST_CASE(verify_missing_atmos_from_some_reels)
+{
+	using VN = dcp::VerificationNote;
+	using VC = VN::Code;
+
+	auto ok_notes = [](path dir, shared_ptr<dcp::CPL> cpl) -> vector<VN> {
+		std::vector<string> const picture_ids = {
+			cpl->reels()[0]->main_picture()->asset()->id(),
+			cpl->reels()[1]->main_picture()->asset()->id()
+		};
+		return vector<VN>{
+			note(VC::NONE_ENCRYPTED, cpl),
+			VN(VC::VALID_CPL_ANNOTATION_TEXT).set_cpl_id(cpl->id()).set_annotation_text("A Test DCP"),
+			note(VC::MATCHING_PKL_ANNOTATION_TEXT_WITH_CPL, cpl),
+			note(VC::VALID_CONTENT_KIND, cpl).set_content_kind("trailer"),
+			note(VC::VALID_CONTENT_VERSION_LABEL_TEXT, cpl).set_content_version(cpl->content_version()->label_text),
+			note(VC::VALID_PICTURE_FRAME_SIZES_IN_BYTES, canonical(dir / "video1.mxf"), cpl).set_reel_index(0).set_asset_id(picture_ids[0]),
+			note(VC::VALID_PICTURE_FRAME_SIZES_IN_BYTES, canonical(dir / "video2.mxf"), cpl).set_reel_index(1).set_asset_id(picture_ids[1]),
+			note(VC::MATCHING_CPL_HASHES, cpl),
+			note(VC::CORRECT_PICTURE_HASH, canonical(dir / "video1.mxf"), cpl).set_reel_index(0).set_asset_id(picture_ids[0]),
+			note(VC::CORRECT_PICTURE_HASH, canonical(dir / "video2.mxf"), cpl).set_reel_index(1).set_asset_id(picture_ids[1]),
+			VN(VC::MISSING_CPL_METADATA, cpl->file().get()).set_cpl_id(cpl->id())
+		};
+	};
+
+	{
+		path dir("build/test/verify_missing_atmos_from_some_reels");
+		auto cpl = verify_atmos_should_be_in_all_reels_check(dir, true, false);
+		auto notes = ok_notes(dir, cpl);
+		notes.push_back(VN(VC::MISSING_ATMOS_FROM_SOME_REELS).set_cpl_id(cpl->id()));
+		check_verify_result({dir}, {}, notes);
+	}
+
+	{
+		path dir("build/test/verify_atmos_in_all_reels");
+		auto cpl = verify_atmos_should_be_in_all_reels_check(dir, true, true);
+		check_verify_result({dir}, {}, ok_notes(dir, cpl));
+	}
+
+	{
+		path dir("build/test/verify_atmos_in_no_reels");
+		auto cpl = verify_atmos_should_be_in_all_reels_check(dir, false, false);
+		check_verify_result({dir}, {}, ok_notes(dir, cpl));
 	}
 }
 
