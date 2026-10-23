@@ -597,7 +597,7 @@ public:
 		 *  file contains the PKL filename
 		 */
 		INVALID_PKL_NAMESPACE,
-		/** If one reel has an Atmos asset, all should have one (SMPTE ST 429-19 section 6.2)
+		/** If one reel has an Atmos asset, all should have one (SMPTE ST 429-19:2019 section 6.2)
 		 *  cpl_id contains the CPL ID
 		 */
 		MISSING_ATMOS_FROM_SOME_REELS,

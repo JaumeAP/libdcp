@@ -3736,7 +3736,7 @@ verify_atmos_should_be_in_all_reels_check(path dir, bool add_to_reel1, bool add_
 }
 
 
-/** SMPTE ST 429-19 says that each reel of a DCP with immersive audio should have it */
+/** SMPTE ST 429-19:2019 section 6.2 says that each reel of a DCP with immersive audio should have it */
 BOOST_AUTO_TEST_CASE(verify_missing_atmos_from_some_reels)
 {
 	using VN = dcp::VerificationNote;
