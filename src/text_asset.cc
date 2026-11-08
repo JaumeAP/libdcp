@@ -977,7 +977,11 @@ format_xml_node (xmlpp::Node const* node, State& state)
 		state.xml += "<" + element->get_name();
 
 		for (auto attribute: element->get_attributes()) {
+#ifdef LIBDCP_XMLPP_5
+			state.xml += fmt::format(" {}=\"{}\"", attribute->get_name(), attribute->get_value());
+#else
 			state.xml += fmt::format(" {}=\"{}\"", attribute->get_name().raw(), attribute->get_value().raw());
+#endif
 		}
 
 		if (children.empty()) {
@@ -997,7 +1001,11 @@ format_xml_node (xmlpp::Node const* node, State& state)
 				state.xml += "\n" + string(state.indent * 2, ' ');
 			}
 
+#ifdef LIBDCP_XMLPP_5
+			state.xml += fmt::format("</{}>", element->get_name());
+#else
 			state.xml += fmt::format("</{}>", element->get_name().raw());
+#endif
 
 			if (should_disable_formatting) {
 				--state.disable_formatting;
@@ -1034,7 +1042,11 @@ TextAsset::format_xml(xmlpp::Document const& document, optional<pair<string, str
 	}
 
 	for (auto attribute: root->get_attributes()) {
+#ifdef LIBDCP_XMLPP_5
+		state.xml += fmt::format(" {}=\"{}\"", attribute->get_name(), attribute->get_value());
+#else
 		state.xml += fmt::format(" {}=\"{}\"", attribute->get_name().raw(), attribute->get_value().raw());
+#endif
 	}
 
 	state.xml += ">";
@@ -1043,7 +1055,11 @@ TextAsset::format_xml(xmlpp::Document const& document, optional<pair<string, str
 		format_xml_node(child, state);
 	}
 
+#ifdef LIBDCP_XMLPP_5
+	state.xml += fmt::format("\n</{}>\n", root->get_name());
+#else
 	state.xml += fmt::format("\n</{}>\n", root->get_name().raw());
+#endif
 
 	return state.xml;
 }

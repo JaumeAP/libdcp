@@ -41,13 +41,14 @@ option_defaults = { "mpeg2": True }
 def build_with_cpp17(target):
     return (
         target.platform.startswith('osx') or
+        target.platform.startswith('windows') or
         (target.platform == 'linux' and target.distro == 'debian' and target.version == 'unstable') or
         (target.platform == 'linux' and target.distro == 'rocky' and target.version == '10')
     )
 
 def dependencies(target, options, for_package):
     deps = [
-        ('libcxml', 'v0.17.17', { 'c++17': build_with_cpp17(target) }),
+        ('libcxml', 'v0.17.18', { 'c++17': build_with_cpp17(target) }),
         ('asdcplib', 'v1.0.11'),
     ]
 
