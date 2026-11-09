@@ -206,9 +206,7 @@ dcp::verify_j2k(shared_ptr<const Data> j2k, int start_index, int frame_index, in
 			auto marker_id = get_8();
 			auto marker_name = marker_name_from_id (marker_id);
 			if (!marker_name) {
-				char buffer[16];
-				snprintf (buffer, 16, "{}x", marker_id);
-				throw InvalidCodestream(fmt::format("unknown marker {}", buffer));
+				throw InvalidCodestream(fmt::format("unknown marker {:02x}", marker_id));
 			} else if (*marker_name == "SOT") {
 				require_16(10, "invalid SOT size {}");
 				get_16(); // tile index

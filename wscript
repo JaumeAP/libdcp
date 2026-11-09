@@ -68,7 +68,7 @@ def options(opt):
     opt.add_option('--disable-dumpimage', action='store_true', default=False, help='disable building of dcpdumpimage')
     opt.add_option('--enable-openmp', action='store_true', default=False, help='enable use of OpenMP')
     opt.add_option('--openmp', default='gomp', help='specify OpenMP Library to use: omp, gomp (default), iomp')
-    opt.add_option('--c++17', action='store_true', default=False, help='build with C++17 and libxml++-4.0')
+    opt.add_option('--c++17', action='store_true', default=False, help='build with C++17 and libxml++-{4,5}.0')
     opt.add_option('--disable-mpeg2-transcode', action='store_true', default=False, help='build without support for MPEG2 transcoding (then ffmpeg is not required)')
 
 def configure(conf):
@@ -77,11 +77,11 @@ def configure(conf):
 
     if vars(conf.options)['c++17']:
         cpp_std = '17'
-        conf.env.XMLPP_API = '4.0'
+        try_xmlpp_api = ['5.0', '4.0']
         conf.env.GLIBMM_API = '2.68'
     else:
         cpp_std = '11'
-        conf.env.XMLPP_API = '2.6'
+        try_xmlpp_api = ['2.6']
         conf.env.GLIBMM_API = '2.4'
 
     conf.env.append_value('CXXFLAGS', ['-Wall', '-Wextra', '-D_FILE_OFFSET_BITS=64', '-D__STDC_FORMAT_MACROS', '-std=c++' + cpp_std])
@@ -167,7 +167,14 @@ def configure(conf):
                    use='OPENSSL',
                    mandatory=False)
 
-    conf.check_cfg(package='libxml++-' + conf.env.XMLPP_API, args='--cflags --libs', uselib_store='LIBXML++', mandatory=True)
+    for api in try_xmlpp_api:
+        if conf.check_cfg(package='libxml++-' + api, args='--cflags --libs', uselib_store='LIBXML++', mandatory=api == try_xmlpp_api[-1]):
+            conf.env.XMLPP_API = api
+            break
+
+    if conf.env.XMLPP_API == '5.0':
+        conf.env.append_value('CXXFLAGS', ['-DLIBDCP_XMLPP_5'])
+
     conf.check_cfg(package='xmlsec1-openssl', args='--cflags --libs', uselib_store='XMLSEC1', mandatory=True)
     # Remove erroneous escaping of quotes from xmlsec1 defines
     conf.env.DEFINES_XMLSEC1 = [f.replace('\\', '') for f in conf.env.DEFINES_XMLSEC1]
@@ -210,7 +217,9 @@ def configure(conf):
         conf.env.HAVE_ASDCPLIB_DCPOMATIC = 1
         conf.env.STLIB_ASDCPLIB_DCPOMATIC = ['asdcp-dcpomatic', 'kumu-dcpomatic']
         conf.env.HAVE_CXML = 1
-        conf.env.LIB_CXML = ['xml++-' + conf.env.XMLPP_API, 'glibmm-' + conf.env.GLIBMM_API]
+        conf.env.LIB_CXML = ['xml++-' + conf.env.XMLPP_API]
+        if conf.env.XMLPP_API != '5.0':
+            conf.env.LIB_CXML.append('glibmm-' + conf.env.GLIBMM_API)
         conf.env.STLIB_CXML = ['cxml']
         conf.check_cfg(package='xerces-c', args='--cflags', uselib_store='XERCES', mandatory=True)
         conf.env.LIB_XERCES = ['xerces-c', 'icuuc', 'curl']
